@@ -120,7 +120,7 @@ drag.prototype={
 	animate:function(){
 		var step=0.8;
         var that=this;
-        var t=setInterval(function () {//时间函数 
+        var t=setInterval(function () {
             that.lengthx*=step;
             var left=that.ele.offsetLeft;
             if(Math.abs(that.lengthx)<1){
@@ -134,7 +134,7 @@ drag.prototype={
             }
             that.ele.style.left=left+that.lengthx+"px";
         },50)
-        var t1=setInterval(function () {//时间函数 
+        var t1=setInterval(function () { 
             that.lengthy=step;
             var top=that.ele.offsetTop;
            if(Math.abs(that.lengthy)<1){
