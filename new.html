@@ -1,0 +1,189 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
+	<title>拖拽</title>
+</head>
+<style>
+	/*.parent{
+		width: 200px;
+		height: 200px;
+		border: 1px solid #000;
+		position: relative; 
+		margin: 200px;
+	}*/
+	.son{
+		width: 100px;
+		height: 100px;
+		background: red;
+		position: absolute;
+		left: 0;
+		top: 0;
+		cursor: pointer;
+	}
+</style>
+<script>
+	function Drag(obj){
+		this.obj=obj.eles;
+		this.minx=obj.rect.minx===undefined?null:obj.rect.minx;
+		this.miny=obj.rect.miny===undefined?null:obj.rect.miny;
+		this.maxx=obj.rect.maxx===undefined?null:obj.rect.maxx;
+		this.maxy=obj.rect.maxy===undefined?null:obj.rect.maxy;
+		this.x=obj.dir.x;
+		this.y=obj.dir.y;
+		this.star();
+	}
+	Drag.prototype={
+		star:function(){
+			// console.log(this)
+			var that=this;
+			this.obj.onmousedown=function(e){
+				var ev=e||window.event;
+				var ox=ev.clientX;
+				var oy=ev.clientY;
+
+				that.prex=ev.clientX;
+				that.prey=ev.clientY;
+
+				var left=that.obj.offsetLeft;
+				var top=that.obj.offsetTop;
+				that.endx=ox-left;
+				that.endy=oy-top;
+				that.move();
+				that.up()
+			}
+		},
+		move:function(){
+			var that=this;
+			document.onmousemove=function(e){
+				var ev=e||window.event;
+				var ox=ev.clientX;
+				var oy=ev.clientY;
+
+				that.nextx=ev.clientX;
+				that.nexty=ev.clientY;
+
+				var x=ox-that.endx;
+				var y=oy-that.endy;
+
+				if(x<that.minx&&that.minx+1){
+					x=that.minx;
+				}
+				if(y<that.miny&&that.miny+1){
+					y=that.miny;
+				}
+				if(x>=that.maxx-that.obj.offsetWidth&&that.maxx){
+					x=that.maxx-that.obj.offsetWidth;
+				}
+				if(y>=that.maxy-that.obj.offsetHeight&&that.maxy){
+					y=that.maxy-that.obj.offsetHeight;
+				}
+				if(that.x===false?that.x:true){
+					that.obj.style.left=x+"px";
+				}
+				if(that.y===false?that.y:true){
+					that.obj.style.top=y+"px";
+				}
+
+				that.lenx=that.nextx-that.prex;
+				that.leny=that.nexty-that.prey;
+				that.prex=that.nextx;
+				that.prey=that.nexty;
+			}
+		},
+		up:function(){
+			var that=this;
+			document.onmouseup=function(){
+				document.onmousemove=null;
+				document.onmouseup=null;
+				that.animate();
+			}
+		},
+		animate:function(e){
+			var yinzi=0.8;
+			var t=setInterval(()=>{
+				this.lenx*=yinzi;
+				var left=this.obj.offsetLeft+this.lenx;
+				if(left<this.minx&&this.minx+1){
+					left=this.minx;
+				}
+				if(left>this.maxx-this.obj.offsetWidth&&this.maxx){
+					left=this.maxx-this.obj.offsetWidth;
+				}
+				if(Math.abs(this.lenx)<1){
+					clearInterval(t);
+				}else{
+					if(this.x){
+						this.obj.style.left=left+"px";
+					}
+				}
+			},50)
+			var t1=setInterval(()=>{
+				this.leny*=yinzi;
+				var top=this.obj.offsetTop+this.leny;
+				if(top<this.miny&&this.miny+1){
+					top=this.miny;
+				}
+				if(top>this.maxy-this.obj.offsetHeight&&this.maxy){
+					top=this.maxy-this.obj.offsetHeight;
+				}
+				if(Math.abs(this.leny)<1){
+					clearInterval(t1);
+				}else{
+					if(this.y){
+						this.obj.style.top=top+"px";
+					}
+				}
+			},50)
+		}
+	}
+	document.addEventListener("DOMContentLoaded",function(){
+		var son=document.getElementsByTagName('div')[0];
+		var drag=new Drag({
+				eles:son,
+				rect:{
+					// minx:0,
+					// maxx:200,
+					// miny:0,
+					// maxy:200
+				},
+				dir:{
+					y:true,
+					x:true
+				}
+			});
+		// drag.star()
+		// var son=document.getElementsByTagName('div')[1];
+		// son.onmousedown=function(e){
+		// 	var ev=e||window.event;
+		// 	var ox=ev.clientX;
+		// 	var oy=ev.clientY;
+		// 	var left=son.offsetLeft;
+		// 	var top=son.offsetTop;
+		// 	var endx=ox-left;
+		// 	var endy=oy-top;
+		// 	console.log(ox);
+		// 	console.log(endx);
+		// 	document.onmousemove=function(e){
+		// 		var ev=e||window.event;
+		// 		var cx=ev.clientX;
+		// 		var cy=ev.clientY;
+		// 		console.log(cx);
+		// 		son.style.left=cx-endx+"px";
+		// 		son.style.top=cy-endy+"px";
+		// 		e.preventDefault(); 
+		// 	}
+		// 	document.onmouseup=function(){
+		// 		document.onmousemove=null;
+		// 		document.onmouseup=null;
+		// 	}
+		// 	e.preventDefault(); 
+		// }
+	})
+</script>
+<body>
+	<!-- <div class="parent"> -->
+		<div class="son"></div>
+	<!-- </div> -->
+</body>
+</html>
