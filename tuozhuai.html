@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title></title>
+<style>
+	
+*{
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+div{
+	width: 100px;
+	height: 100px;
+	background-color: plum;
+	position: absolute;
+	cursor: pointer;
+}
+div:nth-child(1){top: 0;left: 0;}
+div:nth-child(2){top: 100px;left: 0;}
+div:nth-child(3){top: 200px;left: 0;}
+div:nth-child(4){top: 300px;left: 0;}
+div:nth-child(5){top: 400px;left: 0;}
+div:nth-child(6){top: 500px;left: 0;}
+.a{
+	width: 800px;
+	height: 600px;
+	position: relative;
+	top: 0px;left: 200px;
+	border: 1px solid #000;
+}
+</style>
+<script>
+	
+class drag{
+	constructor(obj){
+		//接收参数并且初始化
+		this.obj=document.querySelectorAll(obj.selector)
+		this.unbian=obj.bian==undefined?false:true
+		this.miny=obj.bian===undefined?null:obj.bian.miny
+		this.maxy=obj.bian===undefined?null:obj.bian.maxy
+		this.minx=obj.bian===undefined?null:obj.bian.minx
+		this.maxx=obj.bian===undefined?null:obj.bian.maxx	
+		this.wayx=obj.fangxiang===undefined?true:obj.fangxiang.wayx
+		this.wayy=obj.fangxiang===undefined?true:obj.fangxiang.wayy
+		this.flag=1
+		this.mousedown()
+	}
+	mousedown(){              //按下事件
+		var that=this
+		for(var i=0;i<this.obj.length;i++){
+			this.obj[i].onmousedown=function(e){
+				if(that.flag===1){
+					that.flag=0
+					e.preventDefault()                     //取消浏览器默认事件
+					var ox=this.offsetLeft
+					var oy=this.offsetTop
+					var cx=e.clientX
+					var cy=e.clientY
+					that.prex=e.clientX                   //动画记录位置
+					that.prey=e.clientY
+					that.lenssx=cx-ox                     //计算按下前鼠标位置
+					that.lenssy=cy-oy
+					that.move(this)
+					that.mouseup(this)					
+				}
+
+			}
+		}
+	}
+	move(obj){            //移动事件
+		var that=this
+		document.onmousemove=function(e){
+			e.preventDefault()
+			var cx=e.clientX
+			var cy=e.clientY
+			that.nextx=e.clientX
+			that.nexty=e.clientY
+			that.lenx=that.nextx-that.prex            //动画计算位置
+			that.leny=that.nexty-that.prey
+			that.prex=that.nextx
+			that.prey=that.nexty
+			that.endx=cx-that.lenssx                  //鼠标移动的距离
+			that.endy=cy-that.lenssy
+			if(that.unbian){
+				that.panduanbian(obj)
+			}
+			that.fangxiang(obj)
+		}
+	}
+	mouseup(obj){          //抬起事件
+		var that=this
+		document.onmouseup=function(){
+			document.onmousemove=null
+			document.onmouseup=null
+			that.animate(obj)
+		}
+	}
+	panduanbian(obj){       //判断边界
+		if(this.endx<this.minx){this.endx=this.minx}
+		if(this.endx+obj.offsetWidth>this.maxx){this.endx=this.maxx-obj.offsetWidth}
+		if(this.endy<this.miny){this.endy=this.miny}
+		if(this.endy+obj.offsetHeight>this.maxy){this.endy=this.maxy-obj.offsetHeight}
+	}
+	fangxiang(obj){         //判断方向并移动
+		if(this.wayx===true){obj.style.left=this.endx+"px"}
+		if(this.wayy===true){obj.style.top=this.endy+"px"}	
+	}
+	animate(obj){        //动画
+		var xishu=0.8                     //通过系数控制动画及 t1 停止
+		var t1=setInterval(()=>{
+			this.lenx*=xishu
+			this.leny*=xishu
+			this.endx=this.endx+this.lenx
+			this.endy=this.endy+this.leny	
+			if(Math.abs(this.lenx*xishu)<1&&Math.abs(this.leny*xishu)<1){clearInterval(t1);this.flag=1}
+			this.panduanbian(obj)
+			this.fangxiang(obj)
+			
+		},50)
+	}
+}
+window.onload=function(){
+	new drag({
+		selector:"div",
+		bian:{miny:0,maxy:600,minx:0,maxx:800},
+		fangxiang:{wayx:true,wayy:true}
+	})
+}
+</script>
+	</head>
+	<body>
+<ul class="a">	
+<div></div>
+<div></div>
+<div></div>
+<div></div>
+<div></div>
+<div></div>
+</ul>
+
+	</body>
+</html>
