@@ -1,0 +1,143 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
+	<title>Document</title>
+</head>
+<style>
+	*{
+		margin: 0;
+		padding:0;
+		list-style: none;
+	}
+	div{
+		width: 150px;
+		height: 150px;
+		background-color: pink;
+		border:1px solid red;
+		position: absolute;
+		left: 0;
+		top: 0;
+	}
+
+</style>
+<body>
+<div class="box"></div>
+</body>
+<script>
+
+	class Drag{
+		constructor(obj){ //初始化
+			this.obj=document.querySelectorAll(obj.elec)[0];
+			this.udbianjie=obj.bianjie==undefined?false:true;
+			this.minx=obj.bianjie===undefined?null:obj.bianjie.minx;
+			this.miny=obj.bianjie===undefined?null:obj.bianjie.miny;
+			this.maxx=obj.bianjie===undefined?null:obj.bianjie.maxx;
+			this.maxy=obj.bianjie===undefined?null:obj.bianjie.maxy;
+			this.x=obj.fangxiang===undefined?true:obj.fangxiang.x;
+			this.y=obj.fangxiang===undefined?true:obj.fangxiang.y;
+			this.down();
+
+		}
+	
+	down(){  //按下
+		var that=this;
+		this.obj.onmousedown=function(e){
+			var e=event||window.event;			
+			that.ox=this.offsetLeft;
+            that.oy=this.offsetTop;
+            that.cx=e.clientX;
+            that.cy=e.clientY;
+            that.prex=e.clientX;
+            that.prey=e.clientY;
+            that.lensx=that.cx-that.ox;
+            that.lensy=that.cy-that.oy;
+            that.move(this);
+            that.up(this); 
+		}
+	}
+	move(obj){  //移动
+		var that=this;
+		document.onmousemove=function(e){
+			var e=event||window.event;           	
+        	var cx=e.clientX;
+        	var cy=e.clientY;
+        	that.nextx=e.clientX;
+        	that.nexty=e.clientY;
+        	that.lenx=that.nextx-that.prex;
+        	that.leny=that.nexty-that.prey;
+        	that.prex=that.nextx;
+        	that.prey=that.nexty;
+        	that.endx=cx-that.lensx;
+        	that.endy=cy-that.lensy;
+        	if(that.udbianjie){
+        		that.pdbianjie(obj);
+        	} 
+        	that.fangxiang(obj)       	 	        
+		}
+	}
+	up(obj){  //抬起
+		var that=this;
+		document.onmouseup=function(){
+			document.onmousemove=null;
+            document.onmouseup=null;
+  	        that.donghua(obj);
+		}
+	}
+	pdbianjie(obj){  //边界
+		if (this.endx<this.minx) {
+			this.endx=this.minx
+		}
+		if (this.endx+obj.offsetWidth>this.maxx) {
+			this.endx=this.maxx-obj.offsetWidth
+		}
+		if (this.endy<this.miny) {
+			this.endy=this.miny
+		}
+		if (this.endy+obj.offsetHeight>this.maxy) {
+			this.endy=this.maxy-obj.offsetHeight
+		}
+		
+	}
+	fangxiang(obj){  //方向
+		if (this.x===true) {
+			obj.style.left=this.endx+"px";
+		}
+		if (this.y===true) {
+			obj.style.top=this.endy+"px";
+		}
+	}
+	donghua(obj){
+		var temp=0.5;
+		var t=setInterval(()=>{   //改变this指针 箭头函数
+               this.lenx*=temp;
+               this.leny*=temp;
+               this.endx=this.endx+this.lenx;
+               this.endy=this.endy+this.leny;
+               if (Math.abs(this.lenx*temp)<1&&Math.abs(this.leny*temp)<1) {
+               	clearInterval(t)
+               }
+               this.pdbianjie(obj);
+               this.fangxiang(obj);
+
+		},100)
+	}
+
+}
+	
+
+
+window.onload=function(){
+    new Drag({
+    	elec:".box",
+    	bianjie:{minx:0,miny:0,maxx:1000,maxy:1000},
+    	fangxiang:{
+    		x:true,
+    		y:true,
+    	}
+    })
+}
+	
+
+</script>
+</html>
