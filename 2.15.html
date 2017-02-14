@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title></title>
+	</head>
+	<style>
+		#box{
+			width: 600px;
+			height:600px;
+			border: 1px solid #000;
+			position: relative;
+			margin: 0 auto;
+		}
+		div{
+			width: 100px;
+			height:100px;
+			border: 1px solid #000;
+			position: absolute;			
+		}
+		div:nth-child(1){
+			top:0px;
+			left: 0;
+		}
+		div:nth-child(2){
+			top:100px;
+			left: 0;
+		}
+		div:nth-child(3){
+			top:200px;
+			left: 0;
+		}
+		div:nth-child(4){
+			top:300px;
+			left: 0;
+		}
+		div:nth-child(5){
+			top:400px;
+			left: 0;
+		}
+	</style>
+	<body>
+		<div id="box">
+			<div></div>
+			<div></div>
+			<div></div>
+			<div></div>
+			<div></div>
+		</div>
+		
+	</body>
+	<script>
+	//1.拖拽的元素要定位
+	//2.分析拖拽的动作 
+		//鼠标按下      移动      抬起
+	//3.分解动作
+		class drag{
+			constructor(selector){
+				this.eles=document.querySelectorAll(selector.sel)	//获取操作对象
+//				console.log(this.eles)
+				this.startDrag()
+				this.dirx=selector.dir.x===false? selector.dir.x:true;
+				this.diry=selector.dir.y===false? selector.dir.y:true;
+				this.minx=selector.rect==undefined? null:selector.rect.minx
+				this.miny=selector.rect==undefined? null:selector.rect.miny
+				this.maxx=selector.rect==undefined? null:selector.rect.maxx
+				this.maxy=selector.rect==undefined? null:selector.rect.maxy
+			}
+			startDrag(){
+				var that=this
+				for(var i=0;i<this.eles.length;i++){   //循环获取对象
+					this.eles[i].onmousedown=function(e){ //事件发生时存储信息在e中
+						var left=this.offsetLeft;
+						var top=this.offsetTop;
+						var cx=e.clientX;
+						var cy=e.clientY;
+						that.prex=e.clientX
+						that.prey=e.clientY
+						that.endx=cx-left
+						that.endy=cy-top
+						that.move(this)
+						that.up(this)
+						e.preventDefault()
+					}
+				}
+			}
+			move(obj){
+				var that=this
+				document.onmousemove=function(e){
+					e.preventDefault()
+					var cx=e.clientX;
+					var cy=e.clientY;
+					var lenx=cx-that.endx
+					var leny=cy-that.endy
+					that.nextx=e.clientX
+					that.nexty=e.clientY
+					if(lenx<that.minx&&that.minx){
+						lenx=that.minx
+					}
+					if(lenx>that.maxx-obj.offsetWidth&&that.maxx-obj.offsetWidth){
+						lenx=that.maxx-obj.offsetWidth
+					}
+					if(leny<that.miny&&that.miny){
+						leny=that.miny
+					}
+					if(leny>that.maxy-obj.offsetHeight&&that.maxy-obj.offsetHeight){
+						leny=that.maxy-obj.offsetHeight
+					}
+					if(that.dirx){
+						obj.style.left=lenx+"px"
+					}
+					if(that.diry){
+						obj.style.top=leny+"px"
+					}
+					that.lenx=that.nextx-that.prex
+					that.leny=that.nexty-that.prey
+					that.prex=that.nextx
+					that.prey=that.nexty
+				}
+			}
+			up(obj){
+				var that=this
+				document.onmouseup=function(){ // 箭头函数，this指针始终指向
+//					console.log(this)
+//					console.log(this.lenx+---+)
+					document.onmousemove=null;
+					document.onmouseup=null;
+					that.animate(obj)
+				}
+			}
+			animate(obj){
+				var yinzi=0.8  //速度因子
+				var t=setInterval(()=>{
+					this.lenx*=yinzi;
+					this.leny*=yinzi;
+					var left=obj.offsetLeft+this.lenx;
+					var top=obj.offsetTop+this.leny
+					if(Math.abs(this.lenx)<1){
+						clearInterval(t)
+					}
+					if(Math.abs(this.leny)<1){
+						clearInterval(t)
+					}
+					if(left<this.minx&&this.minx){
+						left=this.minx
+					}
+					if(left>this.maxx-obj.offsetWidth&&this.maxx-obj.offsetWidth){
+						left=this.maxx-obj.offsetWidth
+					}
+					if(top<this.miny&&this.miny){
+						top=this.miny
+					}
+					if(top>this.maxy-obj.offsetHeight&&this.maxy-obj.offsetHeight){
+						top=this.maxy-obj.offsetHeight
+					}
+					if(this.dirx){
+						obj.style.left=left+"px"
+					}
+					if(this.diry){
+						obj.style.top=top+"px"
+					}
+				},50)
+			}
+		}
+		new drag({sel:"#box div",rect:{minx:1,miny:1,maxx:600,maxy:600},dir:{x:true,y:true}});
+
+	</script>
+</html>
