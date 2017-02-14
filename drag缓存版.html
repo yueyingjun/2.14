@@ -102,10 +102,10 @@
 					that.x=that.cx-that.ox;//obj的left
 					that.y=that.cy-that.oy;
 					//判定边界
-					if(that.x<=that.minx&&that.minx){that.x=that.minx}
-					if(that.x>=that.maxx&&that.maxx){that.x=that.maxx}
-					if(that.y<=that.miny&&that.miny){that.y=that.miny}
-					if(that.y>=that.maxy&&that.maxy){that.y=that.maxy}
+					if(that.x<=that.minx&&that.minx!=null){that.x=that.minx}
+					if(that.x>=that.maxx&&that.maxx!=null){that.x=that.maxx}
+					if(that.y<=that.miny&&that.miny!=null){that.y=that.miny}
+					if(that.y>=that.maxy&&that.maxy!=null){that.y=that.maxy}
 					if(that.dirx){obj.style.left=that.x+"px";}
 					if(that.diry){obj.style.top=that.y+"px";}
 					//animate之后的 left top
@@ -133,8 +133,8 @@
 					//循环的left
 					this.lenx*=num;
 					this.x=obj.offsetLeft+this.lenx;
-					if(this.x<=this.minx&&this.minx){this.x=this.minx}
-					if(this.x>=this.maxx&&this.maxx){this.x=this.maxx}
+					if(this.x<=this.minx&&this.minx!=null){this.x=this.minx}
+					if(this.x>=this.maxx&&this.maxx!=null){this.x=this.maxx}
 					obj.style.left=this.x+"px";
 					//结束时间函数
 					if(Math.abs(this.lenx)<0.5){clearInterval(t)};
@@ -143,8 +143,8 @@
 					//循环的top
 					this.leny*=num;
 					this.y=obj.offsetTop+this.leny;
-					if(this.y<=this.miny&&this.miny){this.y=this.miny}
-					if(this.y>=this.maxy&&this.maxy){this.y=this.maxy}
+					if(this.y<=this.miny&&this.miny!=null){this.y=this.miny}
+					if(this.y>=this.maxy&&this.maxy!=null){this.y=this.maxy}
 					obj.style.top=this.y+"px";
 					//结束时间函数
 					if(Math.abs(this.leny)<0.5){clearInterval(t1)};
