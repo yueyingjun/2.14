@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>拖拽1</title>
+</head>
+<style>
+    body{
+        margin: 0;
+        padding: 0;
+    }
+    .parent{
+        width: 500px;
+        height:500px;
+        border:1px solid brown;
+        position: relative;
+
+    }
+    .son{
+        width: 100px;
+        height:100px;
+        position: absolute;
+        top:0px;
+        left:0px;
+        background: #FF0000;
+    }
+</style>
+<script>
+    
+    /*
+     * 拖拽元素函数功能：
+     * 				1、可以传入选择器
+     * 				2、限制范围
+     * 				3、控制方向：x轴方向移动、y轴方向移动。
+     * 			采用面向对象的方式，按下鼠标  才会有移动  才会有抬起
+     *
+     *
+     **/
+    function drag(obj) {
+        this.obj = obj.sun;
+//        this.minx=obj.rect.minx==undefined?null:obj.rect;
+//        this.miny=obj.rect.miny==undefined?null:obj.rect;
+//        this.maxx=obj.rect.maxx==undefined?null:obj.rect;
+//        this.maxy=obj.rect.maxy==undefined?null:obj.rect;
+        this.minx=obj.rect.minx==undefined?0:obj.rect.minx;
+        this.miny=obj.rect.miny==undefined?0:obj.rect.miny;
+        this.maxx=obj.rect.maxx==undefined?document.documentElement.clientWidth:obj.rect.maxx;
+        this.maxy=obj.rect.maxy==undefined?document.documentElement.clientHeight:obj.rect.maxy;
+        this.dirx=obj.dir.x===false?obj.dir.x:true;
+        this.diry=obj.dir.y===false?obj.dir.y:true;
+        //console.log(this.obj)
+        this.start();
+    }
+        drag.prototype={
+            start:function () {
+                var that=this;//保存this指针
+                //console.log(that);
+                this.obj.onmousedown=function (e) {
+                    //console.log(this.obj)
+                   var left=that.obj.offsetLeft;//获取该元素距父元素x的距离
+                    that.prey=e.clientY;
+                   //console.log(that.obj)
+                    var top=that.obj.offsetTop;//获取该元素距父元素y的距离
+                    var cx=e.clientX;//获取该点到浏览器左边的距离
+                    var cy=e.clientY;//获取该点到浏览器上边的距离
+                    that.prex=e.clientX;
+                    that.lenx=cx-left;//计算他们的差值，保存在属性里；
+                    that.leny=cy-top;//计算他们的差值，保存在属性里；
+                    //console.log(cx,cy)
+                    that.move();//调用move（）方法
+                    that.up();//调用up（）方法
+                    e.preventDefault();//阻止浏览器的默认行为
+                }
+            },
+            move:function () {//移动
+                var that=this;
+                document.onmousemove=function (e) {
+                    var cx=e.clientX;
+                    var cy=e.clientY;
+                    that.nextx=e.clientX;
+                    that.nexty=e.clientY;
+                    var left=cx-that.lenx;
+                    var top=cy-that.leny;
+                    //判断边界，小于最小值，让他等于最小值，大于最大值-对象的宽度或者高度，让他等于最大值最大值-对象的宽度或者高度
+                    if(left<that.minx){
+                        left=that.minx;
+                    }
+                    if(top<that.miny){
+                        top=that.miny;
+                    }
+                    if(top>that.maxy-that.obj.offsetHeight){
+                        top=that.maxy-that.obj.offsetHeight;
+                    }
+                    if(left>that.maxx-that.obj.offsetWidth){
+                        left=that.maxx-that.obj.offsetWidth;
+                    }
+                    //使其只横向运动
+                    if(that.dirx){
+                        that.obj.style.left=left+"px";
+                    }
+                    //使其只纵向运动
+                    if(that.diry){
+                        that.obj.style.top=top+"px";
+                    }
+                    e.preventDefault();//阻止浏览器的默认行为
+                    that.lenx=that.nextx-that.prex;
+                    that.leny=that.nexty-that.prey;
+                    that.prex=that.nextx;
+                    that.prey=that.nexty;
+                }
+            },
+            up:function () {//抬起时，清空移动与自身的事件
+                var that=this;
+                document.onmouseup=function () {
+                    document.onmousemove=null;
+                    document.onmouseup=null;
+                    that.animate();
+                }
+            },
+            //运动时，结束的位置减去起始的位置，就是移动的长度，系数为小数，才会使其停下来，
+            animate:function () {
+                var xishu=0.8;
+                var that=this;
+                var t=setInterval(function () {//时间函数
+                    that.lenx*=xishu;
+                    that.leny*=xishu;
+                    var left=that.obj.offsetLeft;
+                    var top=that.obj.offsetTop;
+                    if(Math.abs(that.lenx)<1){
+                        clearInterval(t);
+
+                    }else if(Math.abs(that.leny)<1){
+                        clearInterval(t);
+                    }else{
+                        if(left<that.minx){
+                            left=that.minx;
+                        }
+                        if(top<that.miny){
+                            top=that.miny;
+                        }
+                        if(top>that.maxy-that.obj.offsetHeight){
+                            top=that.maxy-that.obj.offsetHeight;
+                        }
+                        if(left>that.maxx-that.obj.offsetWidth){
+                            left=that.maxx-that.obj.offsetWidth;
+                        }
+                    }
+                        that.obj.style.left=left+that.lenx+"px";//距离左边的距离是实际的距离+运动的x
+                        that.obj.style.top=top+that.leny+"px";//距离上边的距离是实际的距离+运动的y
+
+
+                },50)
+            }
+        }
+
+    window.onload=function () {
+        var son=document.getElementsByClassName("son")[0];
+        new drag({
+            sun:son,
+            rect:{
+//                minx:0,
+//                miny:0,
+//                maxx:500,
+//                maxy:500
+            },
+            dir:{
+                x:true,
+                y:true
+            }
+        });
+
+    }
+</script>
+<body>
+<div class="parent">
+    <div class="son"></div>
+</div>
+</body>
+</html>
