@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title></title>
+	</head>
+	<style>
+		.parent{position:relative;left:0;top:0;border:1px solid black;width:500px;height:500px;margin:50px auto;}
+		.son{position:absolute;left:0;top:0;background:orangered;width:70px;height:70px;}
+	</style>
+	<body>
+		<div class="parent">
+			<div class="son"></div>
+		</div>
+		
+	</body>
+	<script>
+//		var obj=document.getElementsByTagName('div')[1];
+//		this.obj.onmousedown=function(e){
+//			var that=this
+//			var cx=e.clientX;
+//			var cy=e.clientY;
+//			var ox=obj.offsetLeft;
+//			var oy=obj.offsetTop;
+//			that.x=cx-ox;
+//			that.y=cy-oy;
+//			e.preventDefault();
+//			document.onmousemove=function(e){
+//				var cx=e.clientX;
+//				var cy=e.clientY;
+//				obj.style.left=cx-that.x+"px";
+//				obj.style.top=cy-that.y+"px";
+//				e.preventDefault();
+//			}
+//			document.onmouseup=function(){
+//				obj.onmousemove=null;
+//				obj.onmouseup=null;
+//			}
+//		}
+	</script>
+	
+	<script>
+		function drag(obj){
+			this.obj=obj.ele;
+			this.minx=obj.rect.minx===undefined?null:obj.rect.minx;
+			this.miny=obj.rect.miny===undefined?null:obj.rect.miny;
+			this.maxx=obj.rect.maxx===undefined?null:obj.rect.maxx;
+			this.maxy=obj.rect.maxy===undefined?null:obj.rect.maxy;
+			this.x=obj.dir.x===false?obj.dir.x:true;
+			this.y=obj.dir.y===false?obj.dir.y:true;
+			console.log(this.y)
+			this.start=this.start();
+		}
+		drag.prototype={
+			start:function(){
+				var that=this;
+				this.obj.onmousedown=function(e){
+					var cx=e.clientX;
+					var cy=e.clientY;
+					var ox=that.obj.offsetLeft;
+					var oy=that.obj.offsetTop;
+					that.endx=cx-ox;
+					that.endy=cy-oy;
+					that.prex=e.clientX;
+					that.prey=e.clientY;
+					that.move();
+					that.up();
+					e.preventDefault();
+				}
+			},
+			move:function(){
+				var that=this;
+				document.onmousemove=function(e){
+//					alert(2)
+					var cx=e.clientX;
+					var cy=e.clientY; 
+					var left=cx-that.endx;
+					var top=cy-that.endy;
+					that.nextx=e.clientX;
+					that.nexty=e.clientY;
+					
+					if(left<that.minx&&that.minx+1){
+						left=that.obj.minx;
+					}
+					if(top<that.miny&&that.miny+1){
+						top=that.obj.miny;
+					}
+					if(left>=that.maxx-that.obj.offsetWidth&&that.maxx){
+						left=that.maxx-that.obj.offsetWidth;
+					}
+					if(top>=that.maxy-that.obj.offsetHeight&&that.maxy){
+						top=that.maxy-that.obj.offsetHeight;
+					}
+					if(that.x){
+						that.obj.style.left=left+"px";
+					}
+					if(that.y){
+						that.obj.style.top=top+"px";
+					}
+					e.preventDefault();
+					that.lenx=that.nextx-that.prex;
+					that.leny=that.nexty-that.prey;
+					that.prex=that.nextx;
+					that.prey=that.nexty;
+				}
+			},
+			up:function(){
+				var that=this
+				document.onmouseup=function(){
+					document.onmousemove=null;
+					document.onmouseup=null;
+					that.animate();
+				}
+			},
+			animate:function(e){
+				var yinzi=0.8;
+				var t=setInterval(()=>{
+					this.lenx*=yinzi;
+					var left=this.obj.offsetLeft+this.lenx;
+					console.log(left)
+					if(left<this.minx&&this.minx+1){
+						left=this.minx;
+					}
+					if(left>this.maxx-this.obj.offsetWidth&&this.maxx){
+						left=this.maxx-this.obj.offsetWidth;
+					}
+					if(Math.abs(this.lenx)<1){
+						clearInterval(t);
+					}else{
+						if(this.x){
+							this.obj.style.left=left+"px";
+						}
+					}
+				},50)
+				var t1=setInterval(()=>{
+					this.leny*=yinzi;
+					var top=this.obj.offsetTop+this.lenx;
+					if(top<this.miny&&this.miny+1){
+						top=this.miny;
+					}
+					if(top>this.maxy-this.obj.offsetHeight&&this.maxy){
+						top=this.maxy-this.obj.offsetHeight;
+					}
+					if(Math.abs(this.leny)<1){
+						clearInterval(t1);
+					}else{
+						if(this.y){
+							this.obj.style.top=top+"px";
+						}
+					}
+				},50)
+			}
+		}
+		var son=document.getElementsByTagName("div")[1];	
+		new drag({
+			ele:son,
+			rect:{
+				minx:0,
+				miny:0,
+				maxx:500,
+				maxy:500
+			},
+			dir:{
+				y:true,
+				x:true
+			}
+		});
+	</script>
+</html>
