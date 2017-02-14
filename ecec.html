@@ -1,0 +1,114 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
+	<title>Document</title>
+</head>
+<body>
+	<div class="fu">
+		<div class="zi"></div>
+	</div>
+	
+</body>
+<style>
+	.fu{
+		width:400px;
+		height:400px;
+		position: relative;
+		margin:100px;
+		border:1px solid yellow;
+		/*	width:400px;
+		height:400px;
+		position: relative;
+		margin:100px;
+		border:1px solid red;*/
+	}
+	.zi{
+		
+		width:100px;
+		height:100px;
+		background:blue;
+		position: absolute;
+	}
+</style>
+
+
+<script>
+	document.addEventListener("DOMContentLoaded",function(){
+		function drug(obj){//面向对象的编程思路
+        this.ez=obj.ez;
+        this.minx=obj.rect.minx===undefined?null:obj.rect.minx;
+			this.miny=obj.rect.miny===undefined?null:obj.rect.miny;
+			this.maxx=obj.rect.maxx===undefined?null:obj.rect.maxx;
+			this.maxy=obj.rect.maxy===undefined?null:obj.rect.maxy;
+			this.leftx=obj.dir.left===false?obj.dir.left:true;
+			this.topy=obj.dir.top===false?obj.dir.top:true;
+        // this.minx=obj.rect.minx==undefined?null:obj.rect.minx;
+        // this.miny=obj.rect.miny===undefined?null:obj.rect.miny;//三元表达式
+        // this.leftx=obj.dir.left==false?obj.dir.left:true;
+        //  this.topy=obj.dir.top===false?obj.dir.top:true;
+         this.action();
+		}
+		drug.prototype={
+			action:function(){
+				var that=this;
+				that.ez.onmousedown=function(e){
+			
+					var left=that.ez.offsetLeft;
+					var top=that.ez.offsetTop;
+					var cx=e.clientX;
+					var cy=e.clientY;
+				
+					that.x=cx-left;
+					that.y=cy-top;
+					that.move();
+					that.up();
+				}
+		},
+		move:function(){
+				var that=this;
+				document.onmousemove=function(e){
+					var cx=e.clientX;
+					var cy=e.clientY;
+				
+					var left=cx-that.x;
+					var top=cy-that.y;
+					if(left<that.minx&&that.minx+1){
+						left=that.minx;
+					}
+					if(left>that.maxx-that.ez.offsetWidth&&that.maxx){
+						left=that.maxx-that.ez.offsetWidth;
+					}
+					if(top<that.miny&&that.miny+1){
+						top=that.miny;
+					}
+					if(top>that.maxy-that.ez.offsetHeight&&that.maxy){
+						top=that.maxy-that.ez.offsetHeight;
+					}
+					if(that.leftx){
+						that.ez.style.left=left+"px";
+					}
+					if(that.topy){
+						that.ez.style.top=top+"px";
+					}
+				
+				}
+			},
+			up:function(){
+				var that=this;
+				document.onmouseup=function(){
+					document.onmousemove=null;
+					document.onmouseup=null;
+					
+				}
+			},
+      }
+		var zi=document.getElementsByClassName("zi")[0];
+		new drug({
+			ez:zi,
+			rect:{minx:0,miny:0,maxx:400,maxy:400},
+			dir:{left:true,top:true}
+		})
+	})
+</script>
+</html>
