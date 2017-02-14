@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title></title>
+		<script src="jquery.min.js"></script>
+	</head>
+	<style>
+	*{
+		padding: 0;
+		margin: 0;
+	}
+		/*#box{
+			width: 600px;
+			height: 600px;
+			background: red;
+			position: relative;
+			left:100px; 
+			top: 0;
+		}
+		#son{
+			position: absolute;
+			left: 0;
+			top: 0;
+			width: 100px;
+			height: 100px;
+			background: greenyellow;
+		}*/
+		div{
+			width:200px;
+			height: 200px;
+			border:1px solid #000;
+			position: absolute;
+			left: 0;
+		}
+		div:nth-child(1){
+			top: 0;
+		}
+		div:nth-child(2){
+			top:300px;
+		}
+		div:nth-child(3){
+			top:600px;
+		}
+		div:nth-child(4){
+			left: 400px;
+			top:600px;
+		}
+		div:nth-child(5){
+			left: 300px;
+			top:900px;
+		}
+	</style>
+	<body>
+		<!--<div id="box">-->
+			<!--<div id="son"></div>-->
+		<!--</div>-->
+		<div></div>
+		<div></div>
+		<div></div>
+		<!--<div></div>
+		<div></div>
+		<div></div>
+		<div></div>
+		<div></div>-->
+		
+		<!--基础思路：-->
+		<!--1.拖拽的元素要定位 margin容易影响其他的盒子-->
+		<!--2.分析拖拽的动作：顺序的原因：因为进入盒子，首先会触发move，所以事件不能添加在一个上，必须先执行按下-->
+		<!--3.分解动作-->
+		<!--4.面向过程、面向对象、es6写法-->
+		<!--5.选择器、判断边界、规定方向、设置动画-->
+	</body>
+	
+	<script>
+	
+		class boxmove{
+			constructor(obj){
+				this.objs=document.querySelectorAll(obj.select);
+				//传入选择器，传入要拖拽的对象
+				//当边界无数值时，不设置
+				//minx,miny数值为0有bug	
+				this.minx=obj.rect.minx===undefined?null:obj.rect.minx;
+				this.maxx=obj.rect.maxx===undefined?null:obj.rect.maxx;
+				this.miny=obj.rect.miny===undefined?null:obj.rect.miny;
+				this.maxy=obj.rect.maxy===undefined?null:obj.rect.maxy;
+				//this.dir.x=obj.dir.x||true;这里如果用这个写法，根据||的特性。永远会选择到true,参数的实际效果不会发挥。因此选择用三元运算符
+				this.dirx=obj.dir.x==false?obj.dir.x:true;
+				this.diry=obj.dir.y==false?obj.dir.y:true;
+				//undefined
+				this.down();
+				//运行 开始拖拽 鼠标按下；
+			}
+			down(){
+				var that=this;
+				for(var i=0;i<this.objs.length;i++){
+					this.objs[i].onmousedown=function(e){
+						//事件对象兼容性，class自身兼容，这个不用写
+						//var e=e||window.event;
+						//距离事件源的距离
+						var x=this.offsetLeft;
+						//this  变量   之前很多都保存成this属性，这次看这个数据需要跨环境使用么，不使用可以var
+						var y=this.offsetTop;
+						var ox=e.clientX;
+						var oy=e.clientY;
+						that.endx=ox-x;
+						//跨环境访问数据，所以保存起来，保存在对象的属性上
+						that.endy=oy-y;
+						that.move(this);
+						//如果这个环境里使用this,调用的是每个obj上的方法，不对，要调用的是对象上的
+						that.up(this);
+						//之前的思想，只有一个盒子：按下时计算距离事件源的边距：offsetX和offsetY，在移动的时候，计算距离浏览器距离clientX减去事件源距离，就可以得到left和top
+						//一个盒子里嵌套一个盒子：按下时计算事件源距离浏览器和盒子距离父元素的边距，得到父盒子距离浏览器的距离和事件源距离子盒子的距离，把这值保存起来，因为它一直固定不会改变。
+						//在移动的时候，计算浏览器减去这个差值，可以得到left和top值
+						//这个算法同样适用于只有一个盒子，所以最终选择用这个方法
+						e.preventDefault();
+						that.prex=e.clientX;
+						that.prey=e.clientY;
+					}
+				}
+			}
+			move(nowobj){
+				var that=this;
+				document.onmousemove=function(e){
+					var e=e||window.event;
+					//换成document调用事件用意//不换跑快容易掉	
+					var cx=e.clientX;
+					var cy=e.clientY;
+					var left=cx-that.endx;
+					var top=cy-that.endy;
+					//if判断是用来控制范围的
+					//之前是判断不要超出浏览器,用浏览器的最大宽度最小宽度及最大高度最小高度控制边界，现在是判断不要超出规定的边界
+					if(top>=that.maxy-nowobj.offsetWidth&&that.maxy){
+						top=that.maxy-nowobj.offsetWidth;
+					}
+					if(left>=that.maxx-nowobj.offsetHeight&&that.maxx){
+						left=that.maxx-nowobj.offsetHeight;
+					}
+					if(top<=that.miny&&that.miny){
+						top=that.miny;
+					}
+					if(left<=that.minx&&that.minx){
+						left=that.minx;
+					}
+					//根据传参判断方向是否可移动
+					if(that.dirx){
+						nowobj.style.left=left+"px";
+					}
+					if(that.diry){
+						nowobj.style.top=top+"px";
+					}
+					//动画效果不理想
+					e.preventDefault();
+					//为何阻止:因为鼠标在页面中移动，如果页面有文字，很容易选中文字，因为选中文字就是按下开始，move选中，操作有些像的地方。很容易触发
+					
+					//创建div,感受动画效果
+//					var newdiv=document.createElement("div");
+//					newdiv.style.cssText="width:10px;height:10px;background:red;position:absolute;left:"+left+"px;top:"+top+"px;"
+//					document.body.appendChild(newdiv);
+//					可以看到当运动快时,newdiv的间距大,慢时间距小
+					
+					that.nextx=e.clientX;
+					that.nexty=e.clientY;
+					that.chax=that.nextx-that.prex;
+					that.chay=that.nexty-that.prey;	
+					that.prex=that.nextx;
+					that.prexy=that.nexty;
+					
+				}
+			}
+			up(nowobj){
+				var that=this;			
+				document.onmouseup=function(e){
+//					抬起要跟着按下换
+					//拖拽页面有文字  会选中 ，动作一样
+					document.onmousemove=null;
+					document.onmouseup=null;
+					e.preventDefault();
+//					console.log(that.chax,that.chay);
+					that.animate(nowobj);
+				}
+			}
+//			加入循环所有内容.然后取消默认动作
+			animate(nowobj){
+				var yinzi=0.8;
+				//设置系数因子
+				if(this.dirx){//加入判断移动方向
+					var t=setInterval(()=>{
+						this.chax*=yinzi;
+						var left=this.chax+nowobj.offsetLeft;
+						if(Math.abs(this.chax)<=1){
+							clearInterval(t);
+						}
+						if(left>=this.maxx-nowobj.offsetHeight&&this.maxx){//加入判断边界
+							left=this.maxx-nowobj.offsetHeight;
+						}
+						if(left<=this.minx&&this.minx){
+							left=this.minx;
+						}
+						nowobj.style.left=left+"px";
+					},50)
+				}
+				if(this.diry){
+					var t2=setInterval(()=>{
+						this.chay*=yinzi;
+						var top=this.chay+nowobj.offsetTop;
+						if(Math.abs(this.chay)<=1){
+							clearInterval(t2);
+						}
+						if(top>=this.maxy-nowobj.offsetWidth&&this.maxy){
+							top=this.maxy-nowobj.offsetWidth;
+						}
+						if(top<=this.miny&&this.miny){
+							top=this.miny;
+						}
+						nowobj.style.top=top+"px";
+					},50)
+				}
+			}
+
+		}
+		var tuobox=new boxmove({select:"div",rect:{minx:10,miny:10,maxx:1200,maxy:600},dir:{x:true,y:true}});
+		//边界如何控制
+		
+	</script>
+</html>
