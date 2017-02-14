@@ -135,7 +135,7 @@
 					this.x=obj.offsetLeft+this.lenx;
 					if(this.x<=this.minx&&this.minx!=null){this.x=this.minx}
 					if(this.x>=this.maxx&&this.maxx!=null){this.x=this.maxx}
-					obj.style.left=this.x+"px";
+					if(this.dirx){obj.style.left=this.x+"px";}
 					//结束时间函数
 					if(Math.abs(this.lenx)<0.5){clearInterval(t)};
 				},50)
@@ -145,7 +145,7 @@
 					this.y=obj.offsetTop+this.leny;
 					if(this.y<=this.miny&&this.miny!=null){this.y=this.miny}
 					if(this.y>=this.maxy&&this.maxy!=null){this.y=this.maxy}
-					obj.style.top=this.y+"px";
+					if(this.diry){obj.style.top=this.y+"px";}
 					//结束时间函数
 					if(Math.abs(this.leny)<0.5){clearInterval(t1)};
 				},50)
@@ -160,7 +160,7 @@
 				maxy:300
 			},
 			dir:{
-				dirx:true,
+				dirx:false,
 				diry:true
 			}
 		});
