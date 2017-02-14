@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title></title>
+	</head>
+	<style>
+		body{
+			margin: 0;
+			padding: 0;
+		}
+		div.fu{
+			width: 500px;
+			height: 500px;
+			position: relative;
+			left: 100px;
+			top: 100px;
+			border:2px solid red;
+		}
+		div.son{
+			width: 200px;
+			border-radius: 20px;
+			height: 200px;
+			cursor: pointer;
+			position: absolute;
+			top: 0;
+			left: 0;
+			transition:background 0.5s,color 0.5s;
+			text-align: center;
+			line-height: 200px;
+			font-size: 100px;
+			background: #666;
+			color: #fff;
+		}
+		div.son:hover{
+			color: #666;
+			background: yellowgreen;
+		}
+	</style>
+	<body>
+		<!--<div class="fu">-->
+			<div class="son"></div>
+		<!--</div>-->
+	</body>
+</html>
+<script type="text/javascript">
+	window.onload=function(){
+		function drags(obj){
+			this.obj=document.querySelectorAll(obj.ele);//全部obj
+			this.minx=obj.size.minx==undefined?null:obj.size.minx;//边界赋初值
+			this.maxx=obj.size.maxx==undefined?null:obj.size.maxx;
+			this.miny=obj.size.miny==undefined?null:obj.size.miny;
+			this.maxy=obj.size.maxy==undefined?null:obj.size.maxy;
+			this.dirx=obj.dir.dirx==false?obj.dir.dirx:true;//方向赋初值
+			this.diry=obj.dir.diry==false?obj.dir.diry:true;
+			//其他参数赋初值
+			this.ox=0;
+			this.oy=0;
+			this.cx=0;
+			this.cy=0;
+			this.x=0;
+			this.y=0;
+			//animate 前后left top
+			this.prex=0;
+			this.prey=0;
+			this.nextx=0;
+			this.nexty=0;
+			this.lenx=0;
+			this.leny=0;
+			this.drag();
+		}
+		drags.prototype={
+			drag:function(){
+				this.down();//调用down
+			},
+			down:function(){
+				var that=this;
+				for(var i=0;i<this.obj.length;i++){
+					this.obj[i].onmousedown=function(e){
+						e.preventDefault();
+						that.cx=e.clientX;//鼠标到窗口的边界
+						that.cy=e.clientY;
+						var left=this.offsetLeft;//obj的left top
+						var top=this.offsetTop;
+						that.ox=that.cx-left;
+						that.oy=that.cy-top;
+						that.move(this);
+						that.up(this);
+						//animate 之前的left top
+						that.prex=this.offsetLeft;
+						that.prey=this.offsetTop;
+					}
+				}
+				
+			},
+			move:function(obj){
+				var that=this;
+				document.onmousemove=function(e){
+					e.preventDefault();
+					that.cx=e.clientX;//到窗口边界
+					that.cy=e.clientY;
+					that.x=that.cx-that.ox;//obj的left
+					that.y=that.cy-that.oy;
+					//判定边界
+					if(that.x<=that.minx&&that.minx){that.x=that.minx}
+					if(that.x>=that.maxx&&that.maxx){that.x=that.maxx}
+					if(that.y<=that.miny&&that.miny){that.y=that.miny}
+					if(that.y>=that.maxy&&that.maxy){that.y=that.maxy}
+					if(that.dirx){obj.style.left=that.x+"px";}
+					if(that.diry){obj.style.top=that.y+"px";}
+					//animate之后的 left top
+					that.nextx=that.x;
+					that.nexty=that.y;
+					that.lenx=that.nextx-that.prex;
+					that.leny=that.nexty-that.prey;
+					//之后的赋值给之前
+					that.prex=that.nextx;
+					that.prey=that.nexty;
+				}
+			},
+			up:function(obj){
+				var that=this;
+				document.onmouseup=function(e){
+					e.preventDefault();
+					document.onmousemove=null;
+					document.onmouseup=null;
+					that.animate(obj);
+				}
+			},
+			animate:function(obj){
+				var num=0.8;
+				var t=setInterval(()=>{
+					//循环的left
+					this.lenx*=num;
+					this.x=obj.offsetLeft+this.lenx;
+					if(this.x<=this.minx&&this.minx){this.x=this.minx}
+					if(this.x>=this.maxx&&this.maxx){this.x=this.maxx}
+					obj.style.left=this.x+"px";
+					//结束时间函数
+					if(Math.abs(this.lenx)<0.5){clearInterval(t)};
+				},50)
+				var t1=setInterval(()=>{
+					//循环的top
+					this.leny*=num;
+					this.y=obj.offsetTop+this.leny;
+					if(this.y<=this.miny&&this.miny){this.y=this.miny}
+					if(this.y>=this.maxy&&this.maxy){this.y=this.maxy}
+					obj.style.top=this.y+"px";
+					//结束时间函数
+					if(Math.abs(this.leny)<0.5){clearInterval(t1)};
+				},50)
+			}
+		}
+		new drags({
+			ele:".son",
+			size:{
+				minx:0,
+				maxx:1000,
+				miny:0,
+				maxy:300
+			},
+			dir:{
+				dirx:true,
+				diry:true
+			}
+		});
+	}
+</script>
