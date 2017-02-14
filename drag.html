@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title></title>
+	</head>
+	<style type="text/css">
+		*{
+			margin: 0;
+			padding: 0;
+			list-style: none;
+		}
+		.parent{
+			width: 400px;
+			height: 400px;
+			background: red;
+			position: relative;
+			margin: 0 auto;
+		}
+		.son{
+			width: 50px;
+			height: 50px;
+			background: blue;
+			position: absolute;
+			left: 0;
+			top: 0;
+		}
+	</style>
+	<body>
+		<div class="parent">
+			<div class="son"></div>
+		</div>
+	</body>
+	<script type="text/javascript">
+		document.addEventListener("DOMContentLoaded",function(){
+//			var obj=document.getElementsByClassName("son")[0];
+//			obj.onmousedown=function(e){
+//				var cx = e.clientX;
+//				var cy = e.clientY;
+//				var left = obj.offsetLeft;
+//				var top = obj.offsetTop;
+//				var x = cx-left;
+//				var y = cy-top;
+//				document.onmousemove=function(e){
+//					var ox = e.clientX;
+//					var oy = e.clientY;
+//					var endx=ox-x;
+//					var endy=oy-y;
+//					obj.style.left=endx+"px";
+//					obj.style.top=endy+"px";
+//				}
+//				document.onmouseup=function(){
+//					document.onmousemove=null;
+//					document.onmouseup=null;
+//				}
+//			}
+
+
+			function Drag(obj){
+				this.obj=obj.ele;
+				this.minx=obj.rect.minx===undefined?null:obj.rect.minx;
+				this.miny=obj.rect.miny===undefined?null:obj.rect.miny;
+				this.maxx=obj.rect.maxx===undefined?null:obj.rect.maxx;
+				this.maxy=obj.rect.maxy===undefined?null:obj.rect.maxy;
+				this.x=obj.dir.x===false?obj.dir.x:true;
+				this.y=obj.dir.y===false?obj.dir.y:true;
+				this.star();
+			}
+			Drag.prototype={
+				star:function(){
+					var that=this;
+					this.obj.onmousedown=function(e){
+						var ox=e.clientX;
+						var oy=e.clientY;
+						var left=that.obj.offsetLeft;
+						var top=that.obj.offsetTop;
+						that.prevx=e.clientX;
+						that.prevy=e.clientY;
+						that.endx=ox-left;
+						that.endy=oy-top;
+						that.move();
+						that.up()
+					}
+				},
+				move:function(){
+					var that=this;
+					document.onmousemove=function(e){
+						var cx=e.clientX;
+						var cy=e.clientY;
+						that.nextx=e.clientX;
+						that.nexty=e.clientY;
+						var x=cx-that.endx;
+						var y=cy-that.endy;
+						if(x<that.minx&&that.minx+1){
+							x=that.minx;
+						}
+						if(y<that.miny&&that.miny+1){
+							y=that.miny;
+						}
+						if(x>=that.maxx-that.obj.offsetWidth&&that.maxx){
+							x=that.maxx-that.obj.offsetWidth;
+						}
+						if(y>=that.maxy-that.obj.offsetHeight&&that.maxy){
+							y=that.maxy-that.obj.offsetHeight;
+						}
+						if(that.x===false?that.x:true){
+							that.obj.style.left=x+"px";
+						}
+						if(that.y===false?that.y:true){
+							that.obj.style.top=y+"px";
+						}
+						that.lenx=that.nextx-that.prevx;
+						that.leny=that.nexty-that.prevy;
+						that.prevx=that.nextx;
+						that.prevy=that.nexty;
+					}
+				},
+				up:function(){
+					var that=this;
+					document.onmouseup=function(){
+						document.onmousemove=null;
+						document.onmouseup=null;
+						that.animate();
+					}
+				},
+				animate:function(e){
+					var yinzi=0.8;
+					var t=setInterval(()=>{
+						this.lenx*=yinzi;
+						this.leny*=yinzi;
+						if(Math.abs(this.lenx)<1){
+							clearInterval(t);
+						}else if(Math.abs(this.leny)<1){
+							clearInterval(t);
+						}else{
+							var x=this.obj.offsetLeft+this.lenx;
+							var y=this.obj.offsetTop+this.leny;
+							if(x<this.minx&&this.minx+1){
+								x=this.minx;
+							}
+							if(x>this.maxx-this.obj.offsetWidth&&this.maxx){
+								x=this.maxx-this.obj.offsetWidth;
+							}
+							if(y<this.miny&&this.miny+1){
+								y=this.miny;
+							}
+							if(y>this.maxy-this.obj.offsetHeight&&this.maxy){
+								y=this.maxy-this.obj.offsetHeight;
+							}
+							this.obj.style.left=x+"px";
+							this.obj.style.top=y+"px";
+						}
+					},50)
+				}
+			}
+			var son=document.getElementsByClassName("son")[0];
+			var drag=new Drag({
+					ele:son,
+					rect:{
+						minx:0,
+						maxx:400,
+						miny:0,
+						maxy:400
+					},
+					dir:{
+						y:true,
+						x:true
+					}
+				});
+			drag.star()
+		})
+	</script>
+</html>
