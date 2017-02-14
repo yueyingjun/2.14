@@ -1,0 +1,189 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
+	<title>面向对象的方式</title>
+	<script src="../js/function2.js"></script>
+	<script src="../js/animate.js"></script>
+</head>
+<style>
+
+.parent{
+	width:600px;
+	height:300px;
+	background: red;
+	margin:50px;
+	position:relative;           
+}
+.son{
+	width:50px;
+	height:50px;
+	position: absolute;
+	background:pink;
+}
+</style>
+
+<body>
+	
+<div class="parent">
+	<div class="son">son</div>
+</div>
+
+</body>
+<script>
+/*
+ * 1. 操作的元素要定位
+ * 2. 分析拖拽的动作
+ * 3. 分解动作
+ * */
+
+
+/*面向对象的方法 （加边界控制、方向控制）*/
+function drag(obj){
+	this.obj=obj;
+	this.ele=obj.ele;
+	this.minx=this.obj.Range.minx==undefined?null:this.obj.Range.minx;
+	this.maxx=this.obj.Range.maxx==undefined?null:this.obj.Range.maxx;
+	this.miny=this.obj.Range.miny==undefined?null:this.obj.Range.miny;
+	this.maxy=this.obj.Range.maxy==undefined?null:this.obj.Range.maxy;
+	this.dirx=this.obj.dir.x==false?this.obj.dir.x:true;
+	this.diry=this.obj.dir.y==false?this.obj.dir.y:true;
+
+	this.startDrag()
+}
+drag.prototype={
+	startDrag:function(){
+		var that=this;
+		this.ele.onmousedown=function(e){
+			var left=this.offsetLeft;
+			var top=this.offsetTop;
+			var cx=e.clientX;
+			var cy=e.clientY;
+			that.prex=e.clientX;
+			that.prey=e.clientY;
+			that.x=cx-left;
+			that.y=cy-top;
+			that.move();
+		    that.up();
+		    e.preventDefault();
+		}
+	},
+	move:function(){
+		var that=this;
+		document.onmousemove=function(e){
+			var cx=e.clientX;
+			var cy=e.clientY;
+			that.nextx=e.clientX;
+			that.nexty=e.clientY;
+			var endx=cx-that.x;
+			var endy=cy-that.y;
+			that.prex=that.nextx;
+			that.prey=that.nexty;
+			//动画计算位置
+			that.lengthx=that.nextx-that.prex            
+			that.lengthy=that.nexty-that.prey
+			that.prex=that.nextx
+			that.prey=that.nexty
+			
+			
+			
+			if(endx<that.minx){
+				endx=that.minx;
+			}
+			if(endx>that.maxx){
+				endx=that.maxx-that.ele.offsetWidth;
+			}
+			if(endy<that.miny){
+				endy=that.miny;
+			}
+			if(endy>that.maxy){
+				endy=that.maxy-that.ele.offsetHeight;
+			}
+			
+			if(that.dirx){
+			    that.ele.style.left=endx+"px";
+			}
+			if(that.diry){
+				that.ele.style.top=endy+"px";
+			}
+            e.preventDefault();
+		}
+	},
+	up:function(){
+		var that=this;
+		document.onmouseup=function(){
+			document.onmousemove=null;
+			document.onmouseup=null;
+			that.animate();
+		}
+	},
+	animate:function(){
+		var step=0.8;
+        var that=this;
+        var t=setInterval(function () {
+            that.lengthx*=step;
+            var left=that.ele.offsetLeft;
+            if(Math.abs(that.lengthx)<1){
+                clearInterval(t);
+            }
+            if(left<that.minx){
+                left=that.minx;
+            }
+            if(left>that.maxx-that.obj.offsetWidth){
+                left=that.maxx-that.obj.offsetWidth;
+            }
+            that.ele.style.left=left+that.lengthx+"px";
+        },50)
+        var t1=setInterval(function () { 
+            that.lengthy=step;
+            var top=that.ele.offsetTop;
+           if(Math.abs(that.lengthy)<1){
+                clearInterval(t1);
+           }
+            if(top<that.miny){
+                top=that.miny;
+            }
+            if(top>that.maxy-that.obj.offsetHeight){
+                top=that.maxy-that.obj.offsetHeight;
+            }
+            that.ele.style.top=top+that.lengthy+"px";
+        },50)
+    }
+} 
+
+window.addEventListener("DOMContentLoaded",function(){
+	var son=document.getElementsByTagName("div")[1];
+	new drag({ele:son,Range:{minx:0,maxx:600,miny:0,maxy:300},dir:{x:true,y:true}});
+})
+
+
+/*面向过程的方法*/
+//window.onload=function(){
+//	var obj=document.getElementsByTagName("div")[1];
+//	obj.onmousedown=function(e){
+//		var left=obj.offsetLeft;     //obj距离定位父元素的距离
+//		var top=obj.offsetTop;
+//		var cx=e.clientX;            //事件对象距离浏览器的距离
+//		var cy=e.clientY;
+//		var x=cx-left;  
+//		var y=cy-top;
+//		document.onmousemove=function(e){
+//			var cx=e.clientX;        //移动过程中，事件对象距离浏览器的距离
+//			var cy=e.clientY;
+//			var endx=cx-x;
+//			var endy=cy-y;
+//			obj.style.left=endx+"px";
+//			obj.style.top=endy+"px";
+//			e.preventDefault();
+//		}
+//		document.onmouseup=function(){
+//			document.onmousemove=null;
+//			document.onmouseup=null;
+//		}
+//		e.preventDefault();
+//	}
+//}
+
+
+</script>
+</html>
