@@ -1,0 +1,149 @@
+<!doctype html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>构造函数式的拖拽</title>
+</head>
+<style>
+	.box{
+		width:600px;
+		height: 400px;
+		border:1px solid #000;
+		position: relative;
+		margin:0 auto;
+	}
+	.pox{
+		width: 100px;
+		height: 100px;
+		background: red;
+		position: absolute;
+		left: 0;
+		top:0;
+	}
+</style>
+<body>
+	<div class="box">
+		<div class="pox"></div>
+	</div>
+</body>
+<script>
+document.addEventListener("DOMContentLoaded",function(){
+	function Drag(obj){
+		this.ele=obj.ele;
+		console.log(this)
+		this.minx=obj.rect.minx===undefined?null:obj.rect.minx;
+		this.miny=obj.rect.miny===undefined?null:obj.rect.miny;
+		this.maxx=obj.rect.maxx===undefined?null:obj.rect.maxx;
+		this.maxy=obj.rect.maxy===undefined?null:obj.rect.maxy;
+		this.leftx=obj.dir.left===false?obj.dir.left:true;
+		this.topy=obj.dir.top===false?obj.dir.top:true;
+		this.start();
+	}
+	Drag.prototype={
+		start:function(){
+			var that=this;
+			that.ele.onmousedown=function(e){
+				var left=that.ele.offsetLeft;
+				var top=that.ele.offsetTop;
+				var cx=e.clientX;
+				var cy=e.clientY;
+				that.prevx=e.clientY;
+				that.prevy=e.clientY;
+				that.x=cx-left;
+				that.y=cy-top;
+				that.move();
+				that.up();
+				console.log(this)
+			}
+		},
+		move:function(){
+			var that=this;
+			document.onmousemove=function(e){
+				var cx=e.clientX;
+				var cy=e.clientY;
+				that.nextx=e.clientX;
+				that.nexty=e.clientY;
+				var left=cx-that.x;
+				var top=cy-that.y;
+				if(left<that.minx&&that.minx+1){
+					left=that.minx;
+				}
+				if(top<that.miny&&that.miny+1){
+					top=that.miny;
+				}
+				if(left>that.maxx-that.ele.offsetWidth&&that.maxx){
+					left=that.maxx-that.ele.offsetWidth;
+				}
+				if(top>that.maxy-that.ele.offsetHeight&&that.maxy){
+					top=that.maxy-that.ele.offsetHeight;
+				}
+				if(that.leftx){
+					that.ele.style.left=left+"px";
+				}
+				if(that.topy){
+					that.ele.style.top=top+"px";
+				}
+				that.lenx=that.nextx-that.prevx;
+				that.leny=that.nexty-that.prevy;
+				that.prevx=that.nextx;
+				that.prevy=that.nexty;
+			}
+		},
+		up:function(){
+			var that=this;
+			document.onmouseup=function(){
+				document.onmousemove=null;
+				document.onmouseup=null;
+				that.animate();
+			}
+		},
+		animate:function(e){
+			var yinzi=0.8;
+			var t=setInterval(()=>{
+				this.lenx*=yinzi;
+				var left=this.ele.offsetLeft+this.lenx;
+				if(left<this.minx&&this.minx+1){
+					left=this.minx;
+				}
+				if(left>this.maxx-this.ele.offsetWidth&&this.maxx){
+					left=this.maxx-this.ele.offsetWidth;
+				}
+				if(Math.abs(this.lenx)<1){
+					clearInterval(t);
+				}else{
+					if(this.leftx){
+						this.ele.style.left=left+"px";
+					}
+				}
+
+			},50)
+			var t1=setInterval(()=>{
+				this.leny*=yinzi;
+				var top=this.ele.offsetTop+this.leny;
+				if(top<this.miny&&this.miny+1){
+					top=this.miny;
+				}
+				if(top>this.maxy-this.ele.offsetHeight&&this.maxy){
+					top=this.maxy-this.ele.offsetHeight;
+				}
+				if(Math.abs(this.leny)<1){
+					clearInterval(t1);
+				}else{
+					if(this.topy){
+						this.ele.style.top=top+"px";
+					}	
+				}
+			},50)
+		}
+	}
+	var pox=document.getElementsByTagName('div')[1];
+	new Drag({
+		ele:pox,
+		rect:{minx:0,miny:0,maxx:600,maxy:400},
+		dir:{left:true,top:true}
+	})
+})
+	
+
+</script>
+</html>
