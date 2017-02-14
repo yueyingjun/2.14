@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <style>
+        *{
+            margin:0;
+            padding: 0;
+        }
+        .father{
+            width: 300px;
+            height: 300px;
+            background: pink;
+            position: relative;
+            margin:300px;
+        }
+        .son{
+            width: 150px;
+            height: 150px;
+            background: plum;
+            position: absolute;
+            top:0;
+            left: 0;
+        }
+    </style>
+    <script>
+//        window.onload=function () {
+//            var obj=document.getElementsByClassName("son")[0];
+//            obj.onmousedown=function (e) {
+//                var left=obj.offsetLeft;
+//                var top=obj.offsetTop;
+//                var cx=e.clientX;
+//                var cy=e.clientY;
+//                var endx=cx-left;
+//                var endy=cy-top;
+//                document.onmousemove=function (e) {
+//                    var cx=e.clientX;
+//                    var cy=e.clientY;
+//                    obj.style.left=cx-endx+"px";
+//                    obj.style.top=cy-endy+"px";
+//                    e.preventDefault();
+//                }
+//                document.onmouseup=function (e) {
+//                    document.onmousemove=null;
+//                    document.onmouseup=null;
+//                    e.preventDefault();
+//                }
+//                e.preventDefault();
+//            }
+
+
+    </script>
+</head>
+<body>
+<!--<div class="father">-->
+    <div class="son">12345</div>
+<!--</div>-->
+</body>
+<script>
+    function  drag(obj) {
+        this.obj=obj.ele;
+        this.minx=obj.rect.minx==undefined?0:obj.rect.minx;
+        this.miny=obj.rect.miny==undefined?0:obj.rect.miny;
+        this.maxx=obj.rect.maxx==undefined?document.documentElement.clientWidth:obj.rect.maxx;
+        this.maxy=obj.rect.maxy==undefined?document.documentElement.clientHeight:obj.rect.maxy;
+
+        this.dirx=obj.dir.x===false?obj.dir.x:true;
+        this.diry=obj.dir.y===false?obj.dir.y:true;
+        this.startDrag();
+    }
+    drag.prototype={
+        startDrag:function () {
+            var that=this;
+            this.obj.onmousedown=function (e) {
+                var left=that.obj.offsetLeft;
+                var top=that.obj.offsetTop;
+                var cx=e.clientX;
+                var cy=e.clientY;
+                that.lenx=cx-left;
+                that.leny=cy-top;
+                that.prex=e.clientX;
+                that.prey=e.clientY;
+                that.move();
+                that.up();
+                e.preventDefault();
+            }
+        },
+        move:function () {
+            var that=this;
+            document.onmousemove=function (e) {
+                var cx=e.clientX;
+                var cy=e.clientY;
+                var left=cx-that.lenx;
+                var top=cy-that.leny;
+                that.nextx=e.clientX;
+                that.nexty=e.clientY;
+                if(left<=that.minx){
+                    left=that.minx;
+                }
+                if(left>that.maxx-that.obj.offsetWidth){
+                    left=that.maxx-that.obj.offsetWidth;
+                }
+                if(top<that.miny){
+                    top=that.miny;
+                }
+                if(top>that.maxy-that.obj.offsetHeight){
+                    top=that.maxy-that.obj.offsetHeight;
+                }
+                if(that.dirx){
+                    that.obj.style.left=left+"px";
+                }
+                if(that.diry) {
+                    that.obj.style.top=top+"px";
+                }
+                that.lenx=that.nextx-that.prex;
+                that.leny=that.nexty-that.prey;
+                that.prex=that.nextx;
+                that.prey=that.nexty;
+                e.preventDefault();
+            }
+        },
+        up:function () {
+            var that=this;
+            document.onmouseup=function () {
+                document.onmousemove=null;
+                document.onmouseup=null;
+                that.animate();
+            }
+        },
+        animate:function () {
+           var yinzi=0.8;
+           var t=setInterval(()=>{
+              this.lenx*=yinzi;
+              this.leny*=yinzi;
+              var left=this.obj.offsetLeft;
+              var top=this.obj.offsetTop;
+                if (Math.abs(this.lenx)<=1) {
+                    clearInterval(t);
+                }
+                else if (Math.abs(this.leny)<=1) {
+                    clearInterval(t);
+                }
+                if(left<=this.minx){
+                    left=this.minx;
+                }
+                if(left>this.maxx-this.obj.offsetWidth){
+                    left=this.maxx-this.obj.offsetWidth;
+                }
+                if(top<this.miny){
+                    top=this.miny;
+                }
+                if(top>this.maxy-this.obj.offsetHeight){
+                    top=this.maxy-this.obj.offsetHeight;
+                }
+                if(this.dirx){
+                    this.obj.style.left=left+this.lenx+"px";
+                }
+                if(this.diry) {
+                    this.obj.style.top=top+this.leny+"px";
+                }
+           },60);
+        }
+
+    }
+    var son=document.getElementsByClassName("son")[0];
+    new drag({
+        ele:son,
+        rect:{},
+        dir:{x:true,y:true}
+    });
+</script>
+</html>
