@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title></title>
+	</head>
+	<script src="jquery.js"></script>
+	<style>
+		body{
+			margin: 0;
+			padding: 0;
+		}
+		div{
+			width: 200px;
+			border-radius: 20px;
+			height: 200px;
+			cursor: pointer;
+			position: fixed;
+			top: 0;
+			left: 0;
+			transition:background 0.5s,color 0.5s;
+			text-align: center;
+			line-height: 200px;
+			font-size: 100px;
+			background: #666;
+			color: #fff;
+		}
+		div:hover{
+			color: #666;
+			background: yellowgreen;
+		}
+	</style>
+	<body>
+	</body>
+</html>
+<script type="text/javascript">
+	class drags{
+		constructor(obj,type){
+			this.type=type||"all";
+			this.obj=obj;
+			this.cw=document.documentElement.clientWidth;
+			this.ch=document.documentElement.clientHeight;
+			this.ow=this.obj.width();
+			this.oh=this.obj.height();
+			this.ox=0;
+			this.oy=0;
+			this.cx=0;
+			this.cy=0;
+			this.x=0;
+			this.y=0;
+			this.flag=true;
+		}
+		drag(){
+			this.resize();
+			this.down();
+		}
+		down(){
+			var that=this;
+			this.obj.mousedown(function(e){
+				e.preventDefault();
+				that.ox=e.offsetX;
+				that.oy=e.offsetY;
+				that.flag=true;
+				that.move();
+				that.up();
+				that.prex=e.offsetX;
+				that.prey=e.offsetY;
+			})
+		}
+		move(){
+			var that=this;
+			$(document).mousemove(function(e){
+				e.preventDefault();
+				that.cx=e.clientX;
+				that.cy=e.clientY;
+				if(that.flag){
+					that.flag=false;
+					that.oldl=that.cx;
+					that.oldt=that.cy;
+				}
+				that.x=that.cx-that.ox;
+				that.y=that.cy-that.oy;
+				if(that.x<0){that.x=0;};
+				if(that.y<0){that.y=0;};
+				if(that.x>that.cw-that.ow){that.x=that.cw-that.ow};
+				if(that.y>that.ch-that.oh){that.y=that.ch-that.oh};
+				if(that.type=="all"){
+					that.obj.css({
+						left:that.x+"px",
+						top:that.y+"px"
+					});
+				}else if(that.type=="top"){
+					that.obj.css("top",that.y+"px");
+				}else if(that.type=="left"){
+					that.obj.css("left",that.x+"px");
+				}
+			})
+		}
+		up(){
+			var that=this;
+			$(document).mouseup(function(e){
+				e.preventDefault();
+				$(this).unbind();
+			})
+		}
+		resize(){
+			var that=this;
+			$(window).resize(function(){
+				that.cw=document.documentElement.clientWidth;
+				that.ch=document.documentElement.clientHeight;
+				var ol=that.obj.offset().left;
+				var ot=that.obj.offset().top;
+				if(ol>that.cw-that.ow){that.obj.css("left",(that.cw-that.ow)+"px")};
+				if(ot>that.ch-that.oh){that.obj.css("top",(that.ch-that.oh)+"px")};
+			})
+		}
+		keys(){
+			var that=this;
+			$(window).keydown(function(e){
+				var left=that.obj.offset().left;
+				var top=that.obj.offset().top;
+				switch(e.keyCode){
+					case 37:
+						left--;
+						if(left<=0){left=0};
+						that.obj.css("left",left+"px");
+					break;
+					case 38:
+						top--;
+						if(top<=0){top=0};
+						that.obj.css("top",top+"px");
+					break;
+					case 39:
+						left++;
+						if(left>=that.cw-that.ow){left=that.cw-that.ow};
+						that.obj.css("left",left+"px");
+					break;
+					case 40:
+						top++;
+						if(top>=that.ch-that.oh){top=that.ch-that.oh};
+						that.obj.css("top",top+"px");
+					break;
+				}
+			})
+				
+		}
+	}
+	//keys 键盘事件  
+	//传值    0  jQuery对象     1  “left” "top" "all" 
+	for(j=9;j>0;j--){
+		var div=$("<div>"+j+"</div>");
+		$(document.body).append(div);
+	}
+	for(var i in $("div")){
+		new drags($("div").eq(i)).drag();
+	}
+	new drags($("div")).keys();
+</script>
