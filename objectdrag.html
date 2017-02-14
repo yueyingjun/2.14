@@ -1,0 +1,179 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
+	<title>面向对象的拖拽</title>
+</head>
+<style>
+*{
+	margin:0;
+	padding: 0;
+}
+	.father{
+		width: 300px;
+		height: 300px;
+		background: yellow;
+		position: relative;
+	}
+	.son{
+		width: 100px;
+		height: 100px;
+		position: absolute;
+		left: 0;
+		top:0;
+		background: pink;
+		font-size: 30px;
+		line-height: 100px;
+		text-align: center;
+	}
+</style>
+<body>
+	<div class="father">
+		<div class="son">拖拽框</div>
+	</div>
+</body>
+<script>
+	window.onload=function(){
+		var father=document.getElementsByClassName("father")[0];
+		var son=document.getElementsByClassName("son")[0];
+		function drag(obj){
+			this.obj=obj.eles;
+			this.minx=obj.rect.minx==undefined?0:obj.rect.minx; //判断边界,默认浏览器宽高
+			this.maxx=obj.rect.maxx==undefined?document.documentElement.clientWidth:obj.rect.maxx;
+			this.miny=obj.rect.miny==undefined?0:obj.rect.miny;
+			this.maxy=obj.rect.maxy==undefined?document.documentElement.clientHeight:obj.rect.maxy;
+
+			this.dirx=obj.direct.dx==false?obj.direct.dx:true; //判断方向
+			this.diry=obj.direct.dy==false?obj.direct.dy:true;
+			this.x=0;
+			this.y=0;
+			//animate 前后点
+			this.prex=0;
+			this.prey=0;
+			this.nextx=0;
+			this.nexty=0;
+			this.start();
+		}
+		drag.prototype={
+			start:function(){
+				var that=this;
+				this.obj.onmousedown=function(e){
+					var ev=e||window.event;
+					if(ev.preventDefault){
+						ev.preventDefault();
+					}else{
+						ev.returnValue=false;
+					}
+					var ox=this.offsetLeft;  //获取相对于有定位元素的父元素的距离
+					var oy=this.offsetTop;
+					var ow=ev.clientX;//获取相对于事件源的距离
+					var oh=ev.clientY;
+					that.endx=ow-ox;//获取一个固定值
+					that.endy=oh-oy;
+
+					that.prex=ox;   //animate 使用
+					that.prey=oy;  
+					that.move(this);
+					that.up(this);
+				}
+			},
+			move:function(obj){
+				var that=this;
+				document.onmousemove=function(e){
+					var ev=e||window.event;
+					if(ev.preventDefault){
+						ev.preventDefault();
+					}else{
+						ev.returnValue=false;
+					}
+					var cx=ev.clientX;
+					var cy=ev.clientY;
+					that.x=cx-that.endx;
+					that.y=cy-that.endy;
+					if(that.x<=that.minx){    //判断边界
+                         that.x=that.minx;    
+					}
+					if(that.x>=that.maxx-that.obj.offsetWidth){
+                         that.x=that.maxx-that.obj.offsetWidth;    
+					}
+					if(that.y<=that.miny){
+                         that.y=that.miny;    
+					}
+					if(that.y>=that.maxy-that.obj.offsetHeight){
+                         that.y=that.maxy-that.obj.offsetHeight;    
+					}
+					if(that.dirx==true){	//判断方向
+						that.obj.style.left=that.x+"px";
+					}
+					if(that.diry==true){
+						that.obj.style.top=that.y+"px";
+					}
+			//直观看animate运动轨迹
+			var  box=document.createElement("div");
+		    document.body.appendChild(box);
+            box.style.cssText="width:5px;height:5px;background:blue;position:absolute;left:"+that.x+"px;top:"+that.y+"px;";
+
+                that.nextx=that.x;  //animate使用
+                that.nexty=that.y;	
+                that.lenx=that.nextx-that.prex;  
+                that.leny=that.nexty-that.prey;
+                that.prex=that.nextx;
+                that.prey=that.nexty;
+				}
+			},
+			up:function(obj){
+				var that=this;
+				document.onmouseup=function(){
+					document.onmousemove=null;
+					document.onmouseup=null;
+					that.animate();
+				}
+			},
+			animate:function(){
+				var xishu=0.6;
+				var that=this;
+				var t=setInterval(function(){
+					that.lenx*=xishu;
+					that.leny*=xishu;
+					var left=that.obj.offsetLeft+that.lenx; //移动的距离
+					var top=that.obj.offsetTop+that.leny;
+					if(left<=that.minx){
+                         left=that.minx;    
+					}
+					if(left>=that.maxx-that.obj.offsetWidth){
+                         left=that.maxx-that.obj.offsetWidth;    
+					}
+					if(top<=that.miny){
+                         top=that.miny;    
+					}
+					if(top>=that.maxy-that.obj.offsetHeight){
+                         top=that.maxy-that.obj.offsetHeight;    
+					}
+					if(that.dirx==true){
+						that.obj.style.left=left+"px";
+					}
+					if(that.diry==true){
+						that.obj.style.top=top+"px";
+					}		
+					if(Math.abs(that.lenx)<1&&Math.abs(that.leny)<1){//缓冲距离绝对值<1时,停止运动
+						clearInterval(t);
+					}
+				},50)
+			}
+		}
+		new drag({
+			eles:son,
+			rect:{
+				// minx:0,
+				// maxx:300,
+				// miny:0,
+				// maxy:300
+				},
+			direct:{
+				dx:true,
+				dy:true
+			}
+		});
+	}
+</script>
+</html>
