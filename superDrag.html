@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title></title>
+		<style>
+			*{
+				padding: 0;
+				margin: 0;
+			}
+			.wrap{
+				width:200px;
+				height: 200px;
+				margin: 20px auto;
+				position: relative;
+				border:1px solid red;
+			}
+			.box{
+				width: 100px;
+				background: blue;
+				height: 100px;
+				border: 1px solid red;
+				position: absolute;
+				left:0;
+				top:0;
+			}
+			/*div:nth-child(1){
+				top:0px;
+			}
+			div:nth-child(2){
+				top:100px;
+			}
+			div:nth-child(3){
+				top:200px;
+			}
+			div:nth-child(4){
+				top:300px;
+			}
+			div:nth-child(5){
+				top:400px;
+			}*/
+		</style>
+	</head>
+	<body>
+		<!--<div class="wrap">-->
+			<div class="box"></div>
+		<!--</div>-->
+		<!--<div class="wrap">-->
+			<!--<div class="box"></div>-->
+		<!--</div>-->
+	</body>
+	<script>
+		/*
+		 * 拖拽元素函数功能：
+		 * 				1、可以传入选择器
+		 * 				2、限制范围
+		 * 				3、控制方向：x轴方向移动、y轴方向移动。
+		 * 
+		 * 
+		 **/
+		document.addEventListener("DOMContentLoaded",function(){
+			class Drag{
+				constructor(obj){		
+					this.dir=obj.direction||{} //方向对象 
+					this.rect=obj.rect||{};  //范围对象
+					this.eles=document.querySelectorAll(obj.box);  //选择器对象
+					this.minx=this.rect.minx==undefined?0:this.rect.minx;
+					this.miny=this.rect.miny==undefined?0:this.rect.miny;
+					this.maxx=this.rect.maxx==undefined?document.documentElement.clientWidth:this.rect.maxx;
+					this.maxy=this.rect.maxy==undefined?document.documentElement.clientHeight:this.rect.maxy;
+					this.directionx=this.dir.x==undefined?true:this.dir.x
+					this.directiony=this.dir.y==undefined?true:this.dir.y;
+				}
+				starDrag(){
+					for(var i=0;i<this.eles.length;i++){
+						var that=this;							//保存this
+						this.eles[i].onmousedown=function(e){
+							var eve=e||window.event;
+							 var cx=eve.clientX;		//获取该点到浏览器左边的距离
+							 var cy=eve.clientY;		//获取该点到浏览器上边的距离
+							 var ol=this.offsetLeft;	//获取该元素距父元素x的距离
+							 var ot=this.offsetTop;		//获取该元素距父元素y的距离
+							 that.lenx=cx-ol			//计算他们的差值，保存在属性里；
+							 that.leny=cy-ot;
+							 that.starx=cx;
+							 that.stary=cy;
+							 that.move(this);			//调用move()方法，把当前的元素传过去；
+							 that.up();					//调用up()方法
+						}
+					}
+				}
+				move(obj){								
+					var that=this;//保存this
+					this.obj=obj;
+					document.onmousemove=function(e){	
+						var eve=e||window.event;
+						var cx=eve.clientX;					
+						var cy=eve.clientY;
+						that.left=cx-that.lenx;			
+						that.top=cy-that.leny;
+						if(that.left<that.minx){
+							that.left=that.minx;
+						}
+						if(that.top<that.miny){
+							that.top=that.miny;
+						}
+						if(that.left>=that.maxx-obj.offsetWidth){
+							that.left=that.maxx-obj.offsetWidth;
+						}
+						if(that.top>=that.maxy-obj.offsetHeight){
+							that.top=that.maxy-obj.offsetHeight;
+						}
+						if(that.directionx){
+							obj.style.left=that.left+"px";
+						}
+						if(that.directiony){
+							obj.style.top=that.top+"px";
+						}
+						that.endx=cx;
+						that.endy=cy;
+						that.reduceX=that.endx-that.starx;
+						that.reduceY=that.endy-that.stary;
+						that.starx=that.endx;
+						that.stary=that.endy;
+					}
+				}
+				up(){
+					document.onmouseup=()=>{
+						document.onmousemove=null;		//除去事件
+						document.onmouseup=null;
+						this.animate();
+					}
+				}
+				animate(){
+					var coefficient=0.8;
+					var t=setInterval(()=>{
+						this.reduceX*=coefficient;
+						this.reduceY*=coefficient;
+						console.log(this.reduceX,this.reduceY)
+						if(Math.abs(this.reduceX)<1){
+							clearInterval(t);
+						}else if(Math.abs(this.reduceY)<1){
+							clearInterval(t);
+						}else{
+							this.left=this.reduceX+this.obj.offsetLeft;
+							this.top=this.reduceY+this.obj.offsetTop;
+							if(this.left<this.minx){
+								this.left=this.minx;
+							}
+							if(this.left>=this.maxx-this.obj.offsetWidth){
+								this.left=this.maxx-this.obj.offsetWidth;	
+							}
+							if(this.top<this.miny){
+									this.top=this.miny;
+							}
+							if(this.top>=this.maxy-this.obj.offsetHeight){
+								this.top=this.maxy-this.obj.offsetHeight;
+							}
+							this.obj.style.left=this.left+"px";
+							this.obj.style.top=this.top+"px";
+						}	
+						
+					},50)
+					
+				}
+			}
+			
+			new Drag({
+				box:".box",
+//				rect:{minx:0,miny:0,maxx:200,maxy:200},
+				direction:{x:true,y:true}
+				}).starDrag()
+			
+			
+			
+			
+		})
+	</script>
+</html>
