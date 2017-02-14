@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title></title>
+	</head>
+	<style>
+		div{
+			width: 200px;height: 200px;
+			border: 1px solid red;
+			position: absolute;
+			left: 0;top: 0;
+		}
+		div:nth-child(1){
+			top: 200px;
+		}
+		div:nth-child(2){
+			top: 400px;
+		}
+		div:nth-child(3){
+			top: 600px;
+		}
+		div:nth-child(4){
+			top: 800px;
+		}
+	</style>
+	<body>
+		<div></div>
+		<div></div>
+		<div></div>
+		<div></div>
+		<div></div>		
+	</body>
+	<script>
+        class drag{
+        	constructor(kys){
+        		this.selector=kys.selector;
+        		this.ele=document.querySelectorAll(this.selector);
+        		this.minx=kys.bianjie.minx===undefined?null:kys.bianjie.minx;
+        		this.miny=kys.bianjie.miny===undefined?null:kys.bianjie.miny;
+        		this.maxx=kys.bianjie.maxx===undefined?null:kys.bianjie.maxx;
+        		this.maxy=kys.bianjie.maxy===undefined?null:kys.bianjie.maxy;
+        		this.xd=kys.fangxiang.xd===false?this.fangxiang.xd:true;
+        		this.yd=kys.fangxiang.yd===false?this.fangxiang.yd:true;
+        		this.down();
+        	}
+        	down(){
+        		var that=this;
+        		for(var i=0;i<this.ele.length;i++){
+        			this.ele[i].onmousedown=function(e){
+        				var cx=e.clientX;
+        				var cy=e.clientY;
+        				var ox=this.offsetLeft;
+        				var oy=this.offsetTop;
+        				that.prex=e.clientX;
+        				that.prey=e.clientY;
+        				that.x=cx-ox;
+        				that.y=cy-oy;
+        				that.move(this);
+        				that.up(this);
+        			}
+        		}
+        	}
+        	move(obj){
+        		var that=this;
+        		document.onmouseover=function(e){
+        			var cx=e.clientX;
+        			var cy=e.clientY;
+        			that.nextx=e.clientX;
+        			that.nexty=e.clientY;
+        			var left=cx-that.x;
+        			var top=cy-that.y;
+        			if(left<that.minx&&that.minx){
+        				left=that.minx
+        			}
+        			if(left>that.maxx&&that.maxx){
+        				left=that.maxx-obj.offsetWidth;
+        			}
+        			if(top<that.miny&&that.miny){
+        				top=that.miny;
+        			}
+        			if(top>that.maxy&&that.maxy){
+        				top=that.maxy-obj.offsetHeight;
+        			}
+        			if(that.xd==true){
+        				obj.style.left=left+"px";
+        			}
+        			if(that.yd==true){
+        				obj.style.top=top+"px";
+        			}
+        		}
+        	}
+        	up(obj){
+        		var that=this;
+        		document.onmouseup=function(e){
+        			document.onmouseover=null;
+        			document.onmouseup=null;
+        			that.lex=that.nextx-that.prex;
+        			that.ley=that.nexty-that.prey;
+        			that.animate(obj);
+        		}
+        	}
+        	animate(obj){
+        		var zijian=0.6;
+    			var t=setInterval(()=>{
+        			this.lex*=zijian;
+        			this.ley*=zijian;
+        			if(Math.abs(this.lex)<1){
+        				clearInterval(t);
+        			}else{
+        				obj.style.left=this.lex+obj.offsetLeft+"px";
+        				this.lex*=zijian;
+        			}
+        			if(Math.abs(this.ley)<1){
+        				clearInterval(t);
+        			}else{
+        				obj.style.top=this.ley+obj.offsetTop+"px";
+        				this.ley*=zijian;
+        			}
+        		},50)
+        	}
+        }
+		document.addEventListener("DOMContentLoaded",function(){
+			new drag({selector:"div"
+			         ,bianjie:{minx:0,miny:0,maxx:1000,maxy:1000}
+			         ,fangxiang:{xd:true,yd:true}
+					});
+		})
+	</script>
+</html>
