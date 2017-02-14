@@ -9,6 +9,7 @@
 		margin: 0;
 	}
 	div.bb{
+		margin: 100px;
 		width: 800px;
 		height: 500px;
 		position: relative;
@@ -48,11 +49,10 @@
 			class drag{
 				constructor(sel){		
 					this.obj=document.querySelectorAll(sel.obj);
-
-					this.minx=sel.rect.minx===undefined?null:sel.rect.minx;
-					this.miny=sel.rect.miny===undefined?null:sel.rect.miny;
-					this.maxx=sel.rect.maxx===undefined?null:sel.rect.maxx;
-					this.maxy=sel.rect.maxy===undefined?null:sel.rect.maxy;
+					this.minx=sel.rect.minx===undefined?0:sel.rect.minx;
+					this.miny=sel.rect.miny===undefined?0:sel.rect.miny;
+					this.maxx=sel.rect.maxx===undefined?this.obj[0].parentNode.offsetWidth:sel.rect.maxx;
+					this.maxy=sel.rect.maxy===undefined?this.obj[0].parentNode.offsetWidth:sel.rect.maxy;
 					
 					this.dirx=sel.dir.x===false?sel.dir.x:true;
 					this.diry=sel.dir.y===false?sel.dir.y:true;
