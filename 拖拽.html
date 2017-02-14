@@ -1,0 +1,149 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
+	<title>拖拽</title>
+</head>
+	<style>
+		*{
+			margin:0;
+			padding:0;
+		}
+		.box{
+			width:800px;
+			height: 800px;
+			position: relative;
+			border:1px solid #000;
+		}
+		.son{
+			width:100px;height: 100px;
+			background: red;
+			position: absolute;
+			top:0;
+			left:0;
+		}
+	</style>
+<body>
+	<div class="box">
+		<div class="son"></div>
+	</div>
+</body>
+<script>
+document.addEventListener("DOMContentLoaded",function(){
+	var son=document.getElementsByClassName("son")[0];
+	class drag{
+		constructor(obj){
+			this.obj=obj.dui;
+			this.minx=obj.rect.minx==undefined?null:obj.rect.minx;
+			this.miny=obj.rect.miny==undefined?null:obj.rect.miny;
+			this.maxx=obj.rect.maxx==undefined?null:obj.rect.maxx;
+			this.maxy=obj.rect.maxy==undefined?null:obj.rect.maxy;
+			this.x=obj.dir.x===false?obj.dir.x:true;
+			this.y=obj.dir.y===false?obj.dir.y:true;
+			this.drags();
+		}
+		drags(){
+			var that=this;
+			this.obj.onmousedown=function(e){
+				var left=this.offsetLeft;
+				var top=this.offsetTop;
+				var cx=e.clientX;
+				var cy=e.clientY;
+				that.prex=e.clientX;
+				that.prey=e.clientY;
+				that.lenx=cx-left;
+				that.leny=cy-top;
+				that.move();
+				that.up()
+			}
+			e.preventDefault();
+		}
+		move(){
+			var that=this;
+			document.onmousemove=function(e){
+				var cx=e.clientX;
+				var cy=e.clientY;
+				var left=cx-that.lenx;
+				var top=cy-that.leny;
+				that.nextx=e.clientX;
+				that.nexty=e.clientY;
+
+				if(left<that.minx&&that.minx){
+					left=that.minx;
+				}
+				if(left>that.maxx-that.obj.offsetWidth&&that.maxx){
+					left=that.maxx-that.obj.offsetWidth;
+				}
+				if(top<that.miny&&that.miny){
+					top=that.miny;
+				}
+				if(top>that.maxy-that.obj.offsetHeight&&that.maxy){
+					top=that.maxx-that.obj.offsetHeight;
+				}
+				if(that.x){
+					that.obj.style.left=left+"px";
+				}
+				if(that.y){
+					that.obj.style.top=top+"px";
+				}
+				that.endx=that.nextx-that.prex;
+				that.endy=that.nexty-that.prey;
+				that.prex=that.nextx;
+				that.prey=that.nexty;
+			}
+		}
+		up(){
+			var that=this;
+			document.onmouseup=function(){
+				document.onmousemove=null;
+				document.onmouseup=null;
+				that.animate();
+			}
+		}
+		animate(){
+			var that=this;
+			var yinzi=0.8;
+			var t=setInterval(function(){
+				that.endx*=yinzi;
+				that.endy*=yinzi;
+				var nowleft=that.obj.offsetLeft+that.endx;
+				var nowtop=that.obj.offsetTop+that.endy;
+				if(Math.abs(that.endx)<1){
+					clearInterval(t);
+				}else{
+					if(nowleft<that.minx&&that.minx){
+						nowleft=that.minx;
+					}
+					if(nowleft>that.maxx-that.obj.offsetWidth&&that.maxx){
+						nowleft=that.maxx-that.obj.offsetWidth;
+					}
+					if(that.x){
+						that.obj.style.left=nowleft+"px";
+					}	
+				};
+				if(Math.abs(that.endy)<1){
+					clearInterval(t);
+				}else{
+					if(nowtop<that.miny&&that.miny){
+						nowtop=that.miny;
+					}
+					if(nowtop>that.maxy-that.obj.offsetHeight&&that.maxy){
+						nowtop=that.maxy-that.obj.offsetHeight;
+					}
+					if(that.y){
+						that.obj.style.top=nowtop+"px";
+					}	
+				};
+			},50)
+		}
+	}
+	
+	new drag({
+			dui:son,
+			rect:{minx:0,maxx:700,miny:0,maxy:700},
+			dir:{x:true,y:true}
+		})
+})
+</script>
+
+</html>
