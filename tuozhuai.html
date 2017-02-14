@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title>拖拽</title>
+		<script src="js/jquery.min.js"></script>
+		<style>
+		.tz{
+			width: 100px;
+			height: 100px;
+			background: red;
+			position: absolute;
+			left: 0;
+			top:0;
+		}
+		</style>
+	</head>
+	<body>
+		<div class="tz"></div>
+	</body>
+	<script>
+		function drag(obj){
+			this.obj=obj.son;
+			this.minx=obj.react.minx;
+			this.miny=obj.react.miny;
+			this.maxx=obj.react.maxx;
+			this.maxy=obj.react.maxy;
+			this.fx=obj.fx.x===false?obj.fx.x:true;
+			this.fy=obj.fx.y===false?obj.fx.y:true;
+			this.down();
+		}
+		drag.prototype={
+			down:function(){
+				var that=this;
+				this.obj.onmousedown=function(e){
+					var ev=e||window.event;
+					var cx=ev.clientX;
+					var cy=ev.clientY;
+					that.startx=cx;
+					that.starty=cy;
+					var ol=that.obj.offsetLeft;
+					var ot=that.obj.offsetTop;
+					that.cl=cx-ol;
+					that.ct=cy-ot;
+					that.move();
+					that.up();
+				}
+			},
+			move:function(){
+				var that=this;
+				document.onmousemove=function(e){
+					var ev=e||window.event;
+					var cx=ev.clientX;
+					var cy=ev.clientY;
+					that.x=cx-that.cl;
+					that.y=cy-that.ct;
+					if(that.x<that.minx){
+						that.x=that.minx;
+					}
+					if(that.y<that.miny){
+						that.y=that.miny;
+					}
+					if(that.x>that.maxx-that.obj.offsetWidth){
+						that.x=that.maxx-that.obj.offsetWidth
+					}
+					if(that.y>that.maxy-that.obj.offsetHeight){
+						that.y=that.maxy-that.obj.offsetHeight
+					}
+					if(that.fx){
+						that.obj.style.left=that.x+"px";
+					}
+					if(that.fy){
+						that.obj.style.top=that.y+"px";
+					}
+					that.endx=cx;
+					that.endy=cy;
+					that.lenx=that.endx-that.startx;
+					that.leny=that.endy-that.starty;
+					that.startx=that.endx;
+					that.starty=that.endy;
+				}
+			},
+			up:function(){
+				var that=this;
+				document.onmouseup=function(){
+					var xishu=0.9;
+					var t=setInterval(function(){
+						that.lenx*=xishu;
+						that.leny*=xishu;
+						if(Math.abs(that.lenx)<=1){
+							clearInterval (t);
+						}
+						var lenl=that.lenx+that.obj.offsetLeft;
+						var lent=that.leny+that.obj.offsetTop;
+						if(lenl<that.minx){
+							lenl=that.minx;
+						}
+						if(lent<that.miny){
+							lent=that.miny;
+						}
+						if(lenl>that.maxx-that.obj.offsetWidth){
+							lenl=that.maxx-that.obj.offsetWidth
+						}
+						if(lent>that.maxy-that.obj.offsetHeight){
+							lent=that.maxy-that.obj.offsetHeight
+						}
+						that.obj.style.left=lenl+"px";
+						that.obj.style.top=lent+"px";
+					},60)
+					document.onmousemove=null;
+					document.onmouseup=null;
+				}
+			}
+		}
+		var obj=document.getElementsByClassName("tz")[0];
+		new drag({son:obj,react:{minx:0,maxx:1200,miny:0,maxy:600},fx:{x:true,y:true}});
+	</script>
+</html>
