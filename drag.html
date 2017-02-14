@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title></title>
+	</head>
+	<style>
+		div{
+			width:100px;
+			height:100px;
+			border:1px solid blue;
+			position:absolute;
+			left:0;
+		}
+		div:nth-child(1){
+			top:0;
+		}
+		div:nth-child(2){
+			top:100px;
+		}
+		div:nth-child(3){
+			top:200px;
+		}
+		div:nth-child(4){
+			top:300px;
+		}
+		div:nth-child(5){
+			top:400px;
+		}
+	</style>
+	<body>
+			<div></div>
+			<div></div>
+			<div></div>
+			<div></div>
+			<div></div>
+	
+	</body>
+	<script>
+		
+		class drag{
+			constructor(obj){
+				this.selector=obj.ele;
+				this.ele=document.querySelectorAll(this.selector);//把每一个取出来的div  存储到ele中
+				this.minx=obj.rect.minx===undefined?null:obj.rect.minx;
+				this.miny=obj.rect.miny===undefined?null:obj.rect.miny;
+				this.maxx=obj.rect.maxx===undefined?null:obj.rect.maxx;
+				this.maxy=obj.rect.maxy===undefined?null:obj.rect.maxy;
+                this.dirx=obj.dir.dirx===false?obj.dir.dirx:true;
+                this.diry=obj.dir.diry===false?obj.dir.diry:true;
+				this.down();
+			}
+			
+				down(){
+					var  that=this;
+					for(var i=0;i<this.ele.length;i++){
+						this.ele[i].onmousedown=function(e){
+							var  ev=e||window.event;
+							var ox=ev.clientX;//鼠标按下去之后距离浏览器左边的距离
+							var oy=ev.clientY;
+							var ow=this.offsetLeft;//事件源距离父元素左边的距离
+							var oh=this.offsetTop;
+							that.prex=ev.clientX;
+							that.prey=ev.clientY;
+							that.lenx=ox-ow;//that  能够让move和up的函数方法访问到
+							that.leny=oy-oh;
+							that.move(this);//本对象的访问方法
+					        that.up(this);
+						}
+					}
+					
+				}
+				move(obj){
+					var that=this;
+					document.onmousemove=function(e){
+						var ev=e||window.event;
+						var cx=ev.clientX;
+						var cy=ev.clientY;
+						var endx=cx-that.lenx;
+						var endy=cx-that.leny;
+						that.nextx=ev.clientX;
+						that.nexty=ev.clientY;
+						if(endx>that.maxx&&that.maxx){
+						    endx=that.maxx-obj.offsetWidth;
+						}
+						if(endx<that.minx&&that.minx){
+							endx=that.minx;
+						}
+						if(endy>that.maxy&&that.maxy){
+							endy=that.maxy-obj.offsetHeight;
+						}
+						if(endy<that.miny&&that.miny){
+							endy=that.miny;
+						}
+                       	if(that.dirx){
+                       	    obj.style.left=cx-that.lenx+"px";
+                       	}if(that.diry){
+                       		obj.style.top=cy-that.leny+"px";
+                       	}
+					}
+				}
+				up(obj){
+					var that=this;
+					document.onmouseup=function(){
+						document.onmousemove=null;
+						document.onmouseup=null;
+						var chax=that.prex-that.nextx;
+						var chay=that.prey-that.nexty;
+						that.animate(obj);//传递animate
+					}
+				}
+				animate(obj){
+					var yinzi=0.8;
+					var t=setInterval(()=>{
+						this.chax*=yinzi;
+						this.chay*=yinzi;
+						if(Math.abs(this.chax)<1){
+							clerarInterval(t);
+						}else {
+							obj.style.left=this.chax+obj.offsetLeft+"px";
+							this.chax*=yinzi;
+						}
+						if(Math.abs(this.chay)<1){
+							clerarInterval(t);
+						}else {
+							obj.style.top=this.chay+obj.offsetTop+"px";
+							this.chay*=yinzi;
+						}
+					},50)
+				}
+			}
+		window.onload=function(){
+			new drag({
+				 ele:"div",
+				 rect:{minx:0,miny:0,maxx:100,maxy:100
+				 },
+				 dir:{
+				 	dirx:true,
+				 	diry:true
+				}
+		   })
+		}
+		
+	</script>
+</html>
