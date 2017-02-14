@@ -1,0 +1,222 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
+	<title>Document</title>
+</head>
+<style>
+/*div{
+	width: 100px;
+	height: 100px;
+	border:1px solid #000;
+	position: absolute;
+}
+div:nth-child(1){
+	left:0;
+	top:0;
+}
+div:nth-child(2){
+	left:0;
+	top:100px;
+}
+div:nth-child(3){
+	left:0;
+	top:200px;
+}
+div:nth-child(4){
+	left:0;
+	top:300px;
+}
+div:nth-child(5){
+	left:0;
+	top:400px;
+}*/
+
+
+.parent{
+   width: 800px;
+   height: 600px;
+   border:1px solid #000;
+   position: absolute;
+   left: 0;right: 0;top:0;bottom: 0;
+   margin: auto;
+}
+.son{
+   width: 100px;
+   height: 100px;
+   background: red;
+   position: absolute;
+}
+</style>
+<body>
+	<!-- <div></div>
+	<div></div>
+	<div></div>
+	<div></div>
+	<div></div> -->
+
+
+   <div class="parent">
+       <div class="son"></div>
+   </div>
+</body>
+<script>
+//面向对象
+// class drag{
+//    constructor(selector){
+//    	 this.eles=document.querySelectorAll(selector);
+//        this.starDrag();
+//    }
+//    starDrag(){
+//    	  var that=this;
+//       for(var i=0;i<this.eles.length;i++){
+//          this.eles[i].onmousedown=function(e){
+//          	that.left=this.offsetLeft;
+//          	that.top=this.offsetTop;
+//          	that.cx=e.clientX;
+//          	that.cy=e.clientY;
+//          	that.lenx=that.cx-that.left;
+//          	that.leny=that.cy-that.top;
+//          	that.move(this);
+//          	that.up();
+//          }
+//       }
+//    }
+//    move(obj){
+//    	  var that=this;
+//    	  document.onmousemove=function(e){
+
+//    	     that.cx=e.clientX;
+//    	     that.cy=e.clientY;
+//    	     obj.style.left=that.cx-that.lenx+"px";
+//    	     obj.style.top=that.cy-that.leny+"px";
+//    	  }
+//    }
+//    up(){
+//    	  document.onmouseup=function(){
+//    	  	document.onmousemove=null;
+//    	    document.onmouseup=null;
+//    	  }
+//    }
+// }
+// new drag("div");
+
+//面向过程
+// var obj=document.querySelector(".son");
+// obj.onmousedown=function(e){
+//    var cx=e.clientX;
+//    var cy=e.clientY;
+//    var left=obj.offsetLeft;
+//    var top=obj.offsetTop;
+//    var x=cx-left;
+//    var y=cy-top;
+//    e.preventDefault();
+//    document.onmousemove=function(e){
+//       var cx=e.clientX;
+//       var cy=e.clientY;
+//       obj.style.left=cx-x+"px";
+//       obj.style.top=cy-y+"px";
+//       e.preventDefault();
+//    }
+//    document.onmouseup=function(){
+//       document.onmousemove=null;
+//       document.onmouseup=null;
+//    }
+// }
+// 
+// 
+function drag(obj){
+   this.obj=obj.ele;
+   this.minx=obj.rect.minx;
+   this.maxx=obj.rect.maxx;
+   this.miny=obj.rect.miny;
+   this.maxy=obj.rect.maxy;
+   this.dirx=obj.dir.x===false? obj.dir.x:true;
+   this.diry=obj.dir.y===false? obj.dir.y:true;
+   this.yizi=0.8;
+   this.prex=0;
+   this.prey=0;
+   this.nextx=0;
+   this.nexty=0;
+   this.down();
+}
+drag.prototype={
+   down:function(){
+      var that=this;
+      this.obj.onmousedown=function(e){
+         var left=this.offsetLeft;
+         var top=this.offsetTop;
+         var cx=e.clientX;
+         var cy=e.clientY;
+         that.x=cx-left;
+         that.y=cy-top;
+         that.move();
+         that.up();
+      }
+   },
+   move:function(){
+      var that=this;
+      document.onmousemove=function(e){
+         var cx=e.clientX;
+         var cy=e.clientY;
+         var left=cx-that.x;
+         var top=cy-that.y;
+         if(left<that.minx){left=that.minx};
+         if(left>that.maxx-that.obj.offsetWidth){left=that.maxx-that.obj.offsetWidth};
+         if(top<that.miny){top=that.miny};
+         if(top>that.maxy-that.obj.offsetHeight){top=that.maxy-that.obj.offsetHeight};
+         if(that.dirx){
+            that.obj.style.left=left+"px";
+         }
+         if(that.diry){
+            that.obj.style.top=top+"px";
+         }  
+         that.nextx=left;
+         that.nexty=top;
+         that.lenx=that.nextx-that.prex;
+         that.leny=that.nexty-that.prey;
+         that.prex=that.nextx;
+         that.prey=that.nexty;
+      }
+   },
+   up:function(){
+      document.onmouseup=()=>{
+          document.onmousemove=null;
+          document.onmouseup=null;
+          this.animate();
+      }
+   },
+   animate:function(){
+      var t=setInterval(()=>{
+         this.lenx*=this.yizi;
+         this.leny*=this.yizi;
+         var x=this.lenx+this.obj.offsetLeft;
+         var y=this.leny+this.obj.offsetTop;
+
+         if(x<this.minx){x=this.minx};
+         if(x>this.maxx-this.obj.offsetWidth){x=this.maxx-this.obj.offsetWidth};
+         if(y<this.miny){y=this.miny};
+         if(y>this.maxy-this.obj.offsetHeight){y=this.maxy-this.obj.offsetHeight};
+
+         if(Math.abs(this.lenx)>=Math.abs(this.leny)){
+              if(Math.abs(this.lenx)<=1){
+                  clearInterval(t);
+              }
+         }else{
+              if(Math.abs(this.leny)<=1){
+                  clearInterval(t);
+              }
+         }
+         if(this.dirx){
+            this.obj.style.left=x+"px";
+         }
+         if(this){
+            this.obj.style.top=y+"px";
+         }
+      },60)
+   }
+}
+var son=document.querySelector(".son");
+new drag({ele:son,rect:{minx:0,maxx:800,miny:0,maxy:600},dir:{x:true,y:true}})
+</script>
+</html>
