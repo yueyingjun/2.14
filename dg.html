@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title></title>
+</head>
+<style>
+    div{
+        width:50px;height:50px;
+        border:1px solid red;
+        background: blue;
+        position: absolute;
+    }
+</style>
+<script>
+    function drag(obj){
+        this.obj=obj.ele;
+        this.minx=obj.der.minx===null?false:obj.der.minx;
+        this.maxx=obj.der.maxx===null?false:obj.der.maxx;
+        this.miny=obj.der.miny===null?false:obj.der.miny;
+        this.maxy=obj.der.maxy===null?false:obj.der.maxy;
+        this.dirx=obj.dir.x===false?obj.dir.x:true;
+        this.diry=obj.dir.y===false?obj.dir.y:true;
+        this.start();
+    }
+    drag.prototype={
+        start:function(){
+            var that=this;
+            this.obj.onmousedown=function(e){
+                var left=that.obj.offsetLeft;
+                var top=that.obj.offsetTop;
+                var cx= e.clientX;
+                var cy= e.clientY;
+                that.startX=cx;
+                that.startY=cy;
+                that.x=cx-left;
+                that.y=cy-top;
+               that.move();
+               that.up();
+                e.preventDefault();
+            }
+        },
+    move:function(e){
+        var that=this;
+        document.onmousemove=function(e){
+            var cx= e.clientX;
+            var cy= e.clientY;
+            var left=cx-that.x;
+            var top=cy-that.y;
+            that.endX=cx;
+            that.endY=cy;
+            if(left<that.minx&&that.minx!=null){left=that.minx}
+            if(left>that.maxx&&that.maxx!=null){left=that.maxx-that.obj.offsetWidth}
+            if(top<that.miny&&that.miny!=null){top=that.miny}
+            if(top>that.maxy&&that.maxy!=null){top=that.maxy-that.obj.offsetHeight}
+            if(that.dirx){
+            that.obj.style.left=left+"px";
+            }
+            if(that.diry){
+            that.obj.style.top=top+"px";
+            }
+            console.log(that.endX)
+            that.moveX=that.endX-that.startX;
+            that.moveY=that.endY-that.startY;
+            that.startX=that.endX;
+            that.startY=that.endY;
+            e.preventDefault();
+        }
+    },
+        up:function(e){
+            var that=this;
+            document.onmouseup=function(e){
+                document.onmousedown=null;
+                document.onmousemove=null;
+                that.donghua();
+            }
+        },
+        donghua:function(){
+            var that=this;
+            var t=setInterval(function(){
+                if(Math.abs(that.moveX)<=1&&Math.abs(that.moveY)<=1){
+                    clearInterval(t);
+                }
+                that.moveX*=0.8;
+                that.moveY*=0.8;
+                var left=that.obj.offsetLeft+that.moveX;
+                var top=that.obj.offsetTop+that.moveY;
+                if(left<that.minx&&that.minx!=null){left=that.minx}
+                if(left>that.maxx&&that.maxx!=null){left=that.maxx-that.obj.offsetWidth}
+                if(top<that.miny&&that.miny!=null){top=that.miny}
+                if(top>that.maxy&&that.maxy!=null){top=that.maxy-that.obj.offsetHeight}
+                if(that.dirx){
+                    that.obj.style.left=left+"px";
+                }
+                if(that.diry){
+                    that.obj.style.top=top+"px";
+                }
+            },60)
+        }
+
+    };
+window.onload=function(){
+    var divs=document.getElementsByTagName("div");
+    new drag({
+        ele:divs[0],
+        der:{minx:0,maxx:200,miny:0,maxy:200},
+        dir:{x:true,y:true}
+    });
+}
+</script>
+<body>
+<div></div>
+</body>
+</html>
