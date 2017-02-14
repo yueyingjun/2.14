@@ -1,0 +1,36 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
+	<title>drag</title>	
+</head>
+<script src="function.js"></script>
+<script src="drag.js"></script>
+<style>
+	.dabox{
+		width: 600px;
+		height: 600px;
+		margin: 0 auto;
+		position: relative;
+		border:1px solid #000;
+	}
+	.box{
+		width: 200px;
+		height: 200px;
+		position: absolute;
+		left: 0;
+		top:0;
+		cursor: pointer;
+		border:1px solid red;
+		background: yellowgreen;
+	}
+</style>
+<body>
+<div class="box"></div>
+</body>
+<script>
+	var box=$(".box")[0];
+	var obj=new drag(box);
+	obj.drags();
+</script>
+</html>
