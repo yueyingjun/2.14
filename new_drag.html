@@ -49,9 +49,11 @@
 			this.x=obj.dir.x===false?obj.dir.x:true;
 			this.y=obj.dir.y===false?obj.dir.y:true;
 			console.log(this.y)
-			this.start=this.start();
+			//刚进来调用开始时的函数
+			this.start();
 		}
 		drag.prototype={
+			//开始按下
 			start:function(){
 				var that=this;
 				this.obj.onmousedown=function(e){
@@ -68,17 +70,18 @@
 					e.preventDefault();
 				}
 			},
+			//移动
 			move:function(){
 				var that=this;
 				document.onmousemove=function(e){
-//					alert(2)
+					//alert(2)
 					var cx=e.clientX;
 					var cy=e.clientY; 
 					var left=cx-that.endx;
 					var top=cy-that.endy;
 					that.nextx=e.clientX;
 					that.nexty=e.clientY;
-					
+					//边界判断
 					if(left<that.minx&&that.minx+1){
 						left=that.obj.minx;
 					}
@@ -91,33 +94,41 @@
 					if(top>=that.maxy-that.obj.offsetHeight&&that.maxy){
 						top=that.maxy-that.obj.offsetHeight;
 					}
+					//方向控制
 					if(that.x){
 						that.obj.style.left=left+"px";
 					}
 					if(that.y){
 						that.obj.style.top=top+"px";
 					}
+					//阻止浏览器默认事件
 					e.preventDefault();
+					//动画控制时移动产生的距离差值
 					that.lenx=that.nextx-that.prex;
 					that.leny=that.nexty-that.prey;
 					that.prex=that.nextx;
 					that.prey=that.nexty;
 				}
 			},
+			//抬起
 			up:function(){
 				var that=this
 				document.onmouseup=function(){
 					document.onmousemove=null;
 					document.onmouseup=null;
+					//调用animate函数
 					that.animate();
 				}
 			},
+			//动画控制
+			//传入事件函数
 			animate:function(e){
 				var yinzi=0.8;
+				//箭头函数：把function()换成()=> 不用改变this指针
 				var t=setInterval(()=>{
 					this.lenx*=yinzi;
 					var left=this.obj.offsetLeft+this.lenx;
-					console.log(left)
+					//console.log(left)
 					if(left<this.minx&&this.minx+1){
 						left=this.minx;
 					}
