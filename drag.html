@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title></title>
+	</head>
+	<style>
+		body{
+			padding: 0;
+			margin:0
+		}
+		div{
+			width: 100px;
+			height: 100px;
+			position: absolute;
+			text-align: center;
+			line-height: 100px;
+			font-size: 20px;
+			font-weight: 400;
+			background: #000;
+			color:#fff
+		}
+		div:nth-child(1){
+			left: 0;
+			top:0;
+			background: red;
+		}
+		div:nth-child(2){
+			left: 0;
+			top:100px;
+			background: yellowgreen;
+		}
+		div:nth-child(3){
+			left: 0;
+			top:200px;
+			background: yellow;
+		}
+		div:nth-child(4){
+			left: 0;
+			top:300px;
+			background: blueviolet;
+		}
+		div:nth-child(5){
+			left: 0;
+			top:400px;
+		}
+	</style>
+	<body>
+		<div>1</div>
+		<div>2</div>
+		<div>3</div>
+		<div>4</div>
+		<div>5</div>
+	</body>
+	<script>
+		class drag{
+			constructor(obj){
+				this.ele=document.querySelectorAll(obj.ele);//获取所有传入的元素
+				this.minx=obj.size.minx==undefined?null:obj.size.minx;//判断有没有传值最小的x轴方向的值
+				this.miny=obj.size.miny==undefined?null:obj.size.miny;
+				this.maxx=obj.size.maxx==undefined?null:obj.size.maxx;
+				this.maxy=obj.size.maxy==undefined?null:obj.size.maxy;
+				this.dirTop=obj.dir.top===false?obj.dir.top:true;//初始化是否能在x,y轴移动 默认为true
+				this.dirLeft=obj.dir.left===false?obj.dir.left:true;
+				this.ox=0;//offsetx			
+				this.oy=0;//offsety
+				this.cx=0;//clientx
+				this.cy=0;//clienty				
+				this.top=0;
+				this.left=0;
+				this.lenx=0;
+				this.leny=0;
+				this.startDrag();
+			}
+			startDrag(){
+				for(var i=0;i<this.ele.length;i++){
+					var that=this;
+					that.ele[i].onmousedown=function(e){						
+						e.preventDefault()
+						that.top=this.offsetTop;//实物到有定位的父元素的Top距离
+						that.left=this.offsetLeft;//实物到有定位的父元素的Left距离
+						that.cx=e.clientX;//事件对象到浏览器左边的距离
+						that.cy=e.clientY;//事件对象到浏览器上边的距离
+						that.preTop=that.top;//刚开始记录盒子的方位
+						that.preLeft=that.left;
+						that.lenx=that.cx-that.left;
+						that.leny=that.cy-that.top;
+						that.move(this);
+						that.up(this)
+					}
+				}
+			}
+			move(obj){
+				var that=this;
+				document.onmousemove=function(e){
+					e.preventDefault()
+					that.cx=e.clientX;//重新测量事件对象到浏览器的距离为了算top
+					that.cy=e.clientY;//重新测量事件对象到浏览器的距离为了算left
+					var top=that.cy-that.leny;
+					var left=that.cx-that.lenx;
+					that.nextTop=top;//移动开始记录现在盒子的位置
+					that.nextLeft=left;
+					that.chay=that.nextTop-that.preTop;//这一次的减去刚开始盒子的位置，算差值，指定盒子停下后要animate的距离
+					that.chax=that.nextLeft-that.preLeft;
+					that.preTop=that.nextTop;//把现在的值赋值给上一次位置，实现一直出现差值
+					that.preLeft=that.nextLeft;
+					if(left<that.minx&&this.minx!=null){//如果left小于给定的最小值，并且最小值存在执行
+						left=that.minx
+					}
+					if(left>that.maxx&&that.maxx!=null){
+						left=that.maxx-obj.offsetWidth
+					}
+					if(top<that.miny&&that.miny!=null){
+						top=that.miny
+					}
+					if(top>that.maxy&&that.maxy!=null){
+						top=that.maxy-obj.offsetHeight
+					}
+					if(that.dirTop){
+						obj.style.top=top+"px"
+					}
+					if(that.dirLeft){
+						obj.style.left=left+"px"
+					}					
+				}
+			}
+			up(obj){
+				var that=this;
+				document.onmouseup=function(){
+					document.onmousemove=null;
+					document.onmouseup=null;
+					that.animate(obj)
+				}				
+			}
+			animate(obj){
+				var xs=0.8;				
+				var that=this;
+				var t=setInterval(function(){
+					that.chax*=xs;
+					var left=obj.offsetLeft+that.chax;
+						console.log(left)
+					
+					if(Math.abs(that.chax)<1){//如果差值小于一就让时间函数停止《没有半个像素》
+						clearInterval(t)
+					}
+					if(left<that.minx&&that.minx!=null){//animate也不能超出给定的区域
+						left=that.minx
+					}
+					if(left>that.maxx-obj.offsetWidth&&that.maxx!=null){
+						left=that.maxx-obj.offsetWidth
+					}
+					if(that.dirLeft){
+						obj.style.left=left+"px";
+					}												
+				},60)
+				
+				
+				var t1=setInterval(function(){
+					that.chay*=xs;
+					var top=obj.offsetTop+that.chay;
+					if(Math.abs(that.chay)<1){
+						clearInterval(t1)
+					}
+					if(top<that.miny&&that.miny!=null){
+						top=that.miny
+					}
+					if(top>that.maxy-obj.offsetHeight&&that.maxy!=null){
+						top=that.maxy-obj.offsetHeight
+					}
+					if(that.dirTop){
+						obj.style.top=top+"px";	
+					}											
+				},60)		
+			}
+		}
+		new drag({ele:"div",
+		size:{
+			minx:0,miny:0,maxx:1000,maxy:500
+		},
+		dir:{left:true,top:true}
+		})
+	</script>
+</html>
