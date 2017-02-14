@@ -1,0 +1,195 @@
+<!doctype html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title></title>
+</head>
+<style>
+	*{
+		padding: 0;
+		margin:0;
+	}
+	b{
+		display: block;
+		width: 500px;
+		height: 500px;
+		background: #f4e4cd;
+	}
+    div{
+    	width: 100px;
+    	height: 100px;
+    	position: absolute;
+    	cursor: pointer;
+    	border-radius: 50%;
+    }
+    div:nth-child(1){
+		top:0;
+		left:0;
+		border:5px solid blue;
+    }
+    div:nth-child(2){
+		top:110px;
+		left:0;
+		border:5px solid yellow;
+    }
+    div:nth-child(3){
+		top:220px;
+		left:0;
+		border:5px solid black;
+    }
+    div:nth-child(4){
+		top:330px;
+		left:0;
+		border:5px solid green;
+    }
+    div:nth-child(5){
+		top:440px;
+		left:0;
+		border:5px solid red;
+    }
+</style>
+<script>
+	class drag{
+		constructor(obj){
+			// this.eles=document.querySelectorAll(obj);
+			this.eles=obj.ele;
+			this.flagx=obj.fangxiang.x==false?obj.fangxiang.x:true;
+			this.flagy=obj.fangxiang.y==false?obj.fangxiang.y:true;
+			this.bjminx=obj.bianjie.minx==undefined?null:obj.bianjie.minx;
+			this.bjminy=obj.bianjie.miny==undefined?null:obj.bianjie.miny;
+			this.bjmaxx=obj.bianjie.maxx==undefined?null:obj.bianjie.maxx;
+			this.bjmaxy=obj.bianjie.maxy==undefined?null:obj.bianjie.maxy;
+			this.drag()
+			this.flag=true;
+			this.t=0;
+		}
+		drag(){
+			var that=this;
+			for (var i = 0; i < this.eles.length; i++) {
+				this.eles[i].onmousedown=function(e){
+					e.preventDefault();
+					that.boxW=this.offsetWidth;
+					that.boxH=this.offsetHeight;
+					var left=this.offsetLeft;
+					var top=this.offsetTop;
+					var cx=e.clientX;
+					var cy=e.clientY;
+					that.startx=e.clientX;
+					that.starty=e.clientY;					
+					that.addx=cx-left;
+					that.addy=cy-top;
+					that.t=clearInterval;
+					// if(that.flag){
+						// that.flag=false;
+						that.move(this);
+						that.up(this);
+					// };
+				}
+				
+			};
+		}
+		move(obj){
+			var that=this;
+			document.onmousemove=function(e){
+				e.preventDefault();
+				var cx=e.clientX;
+				var cy=e.clientY;
+				that.lenx=cx-that.addx;
+				that.leny=cy-that.addy;
+				if(that.lenx>=that.bjmaxx-that.boxW&&that.bjmaxx){
+					that.lenx=that.bjmaxx-that.boxW;
+				}
+				if(that.bjminx==0){
+					that.bjminx=true;
+				}
+				if(that.lenx<=that.bjminx&&that.bjminx){
+					that.lenx=that.bjminx;
+				}
+				if(that.leny>=that.bjmaxy-that.boxH&&that.bjmaxy){
+					that.leny=that.bjmaxy-that.boxH;
+				}
+				if(that.bjminy==0){
+					that.bjminy=true;
+				}
+				if(that.leny<=that.bjminy&&that.bjminy){
+					that.leny=that.bjminy;
+				}
+				if(that.flagx){
+					obj.style.left=that.lenx+"px";
+				}
+				if(that.flagy){
+					obj.style.top=that.leny+"px";
+				}
+				that.lengthx=cx-that.startx;			
+				that.lengthy=cy-that.starty;
+				that.startx=e.clientX;
+				that.starty=e.clientY;			
+			}
+		}
+		up(obj){
+			var that=this;
+			document.onmouseup=function(){
+				document.onmousemove=null;
+				document.onmouseup=null;
+				var xishu=0.99;
+				var t=setInterval(()=>{
+					that.lengthx*=xishu;
+					that.lengthy*=xishu;
+
+					if(Math.abs(that.lengthx)<1){
+						clearInterval(t)
+						// that.flag=true;
+					}else if(Math.abs(that.lengthy)<1){
+						clearInterval(t)
+						// that.flag=true;
+					}
+					var xxx=that.lengthx+obj.offsetLeft;
+					var yyy=that.lengthy+obj.offsetTop;
+
+					if(xxx>=that.bjmaxx-that.boxW&&that.bjmaxx){
+						xxx=that.bjmaxx-that.boxW;
+					}
+					if(that.bjminx==0){
+						that.bjminx=true;
+					}
+					if(xxx<=that.bjminx&&that.bjminx){
+						xxx=that.bjminx;
+					}
+					if(yyy>=that.bjmaxy-that.boxH&&that.bjmaxy){
+						yyy=that.bjmaxy-that.boxH;
+					}
+					if(that.bjminy==0){
+						that.bjminy=true;
+					}
+					if(yyy<=that.bjminy&&that.bjminy){
+						yyy=that.bjminy;
+					}
+					if(that.flagx){
+						obj.style.left=xxx+"px";
+					}
+					if(that.flagy){
+						obj.style.top=yyy+"px";
+					}	
+					
+				},50)
+			}
+		}
+	}
+	document.addEventListener("DOMContentLoaded",function(){
+		var son=document.getElementsByTagName("div")
+		new drag({
+			ele:son,
+			bianjie:{minx:0,miny:0,maxx:800,maxy:500},
+			fangxiang:{x:true,y:true}
+		})
+	})
+</script>
+<body>
+	<div></div>
+	<div></div>
+	<div></div>
+	<div></div>
+	<div></div>
+	<b></b>
+</body>
+</html>
