@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>拖拽</title>
+	<script src="jquery.min.js"></script>
+	<style>
+		*{
+			margin:0;
+			padding:0;
+		}
+		.perent{
+			width: 400px;
+			height: 400px;
+			background: #f00;
+			margin: 100px;
+			position: relative;
+		}
+		.son{
+			width: 100px;
+			height: 100px;
+			background: #0ff;
+			position: absolute;
+			left: 0;
+			top: 0;
+		}
+	</style>
+</head>
+<body>
+	<div class="son"></div>
+</body>
+<script>
+
+// 面向对象
+function drag(obj){
+	this.obj=obj.ele;
+	// console.log(this.obj);
+	this.minx=obj.rect.minx==undefined?null:obj.rect.minx;
+	this.maxx=obj.rect.maxx==undefined?null:obj.rect.maxx;
+	this.miny=obj.rect.miny==undefined?null:obj.rect.miny;
+	this.maxy=obj.rect.maxy==undefined?null:obj.rect.maxy;
+	this.dirx=obj.dir.x==false?obj.dir.x:true;
+	this.diry=obj.dir.y==false?obj.dir.y:true;
+	this.down();
+}
+drag.prototype={
+	down:function(){
+		var that=this;
+		this.obj.onmousedown=function(e){
+			var left=that.obj.offsetLeft;
+			var top=that.obj.offsetTop;
+			var cx=e.clientX;
+			var cy=e.clientY;
+			that.prex=e.clientX;
+			that.prey=e.clientY;
+			that.endx=cx-left;
+			that.endy=cy-top;
+			that.move();
+			that.up();
+			e.preventDefault();
+		}
+	},
+	move:function(){
+		var that=this;
+		document.onmousemove=function(e){
+			var cx=e.clientX;
+			var cy=e.clientY;
+			that.nextx=e.clientX;
+			that.nexty=e.clientY;
+			var left=cx-that.endx;
+			var top=cy-that.endy;
+			if(left<that.minx&&that.minx){
+				left=that.minx;
+			}
+			if(left>that.maxx-that.obj.offsetWidth&&that.maxx){
+				left=that.maxx-that.obj.offsetWidth;
+			}
+			if(top<that.miny&&that.miny){
+				top=that.miny;
+			}
+			if(top>that.maxy-that.obj.offsetHeight&&that.maxy){
+				top=that.maxY-that.obj.offsetHeight;
+			}
+			if(that.dirx){
+				that.obj.style.left=left+"px";
+			}
+			
+			if(that.diry){
+				that.obj.style.top=top+"px";
+			}	
+			e.preventDefault();
+			that.lx=that.nextx-that.prex;
+			that.ly=that.nexty-that.prey;
+			that.prex=that.nextx;
+			that.prey-that.nexty;
+		}
+	},
+	up:function(){
+		var that=this;
+		document.onmouseup=function(){
+			document.onmousemove=null;
+			document.onmouseup=null;
+			that.animate();
+		}
+	},
+	animate(){
+		var that=this;
+		// console.log(that)
+		var yinzi=0.8;
+		if(that.dirx){
+			// console.log(2)
+			var t=setInterval(function(){
+				that.lx*=yinzi;
+				var left=that.lx+that.obj.offsetLeft;
+				// console.log(left)
+				if(Math.abs(that.lx)<=1){
+					clearInterval(t);
+				}
+				if(left<that.minx&&that.minx){
+					left=that.minx;
+				}
+				if(left>that.maxx-that.obj.offsetWidth&&that.maxx){
+					left=that.maxx-that.obj.offsetWidth;
+				}
+				that.obj.style.left=left+"px";
+			},50)
+		}
+		if(that.diry){
+			var t1=setInterval(function(){
+				that.ly*=yinzi;
+				var top=that.ly+that.obj.offsetTop;
+				if(Math.abs(that.ly)<=1){
+					clearInterval(t1);
+				}
+				if(top<that.miny&&that.miny){
+					top=that.miny;
+				}
+				if(top>that.maxy-that.obj.offsetHeight&&that.maxy){
+					top=that.maxy-that.obj.offsetHeight;
+				}
+				that.obj.style.top=top+"px";
+			},50)
+		}
+	}
+}
+window.onload=function(){
+	var son=document.getElementsByClassName("son")[0];
+	// new drag({ele:son,rect:{minx:0,maxx:400,miny:0,maxy:400},dir:{x:true,y:true}});//让一个动  一个传false 传参
+	new drag({ele:son,rect:{},dir:{x:true,y:true}});//不传参
+}
+
+</script>
+</html>
