@@ -1,32 +1,32 @@
 /**
  * Created by lenovo on 2017/2/14.
  */
-//ÍÏ×§£ºÃæÏò¶ÔÏóµÄ·½Ê½£»±ß½ç¿ØÖÆ£¬·½Ïò¿ØÖÆ£¬¶¯»­¿ØÖÆ£¨ÍÏ¶¯ËÙ¶È¿ìµÄ»°ÓĞ¶¯»­Ğ§¹û£©
+//æ‹–æ‹½ï¼šé¢å‘å¯¹è±¡çš„æ–¹å¼ï¼›è¾¹ç•Œæ§åˆ¶ï¼Œæ–¹å‘æ§åˆ¶ï¼ŒåŠ¨ç”»æ§åˆ¶ï¼ˆæ‹–åŠ¨é€Ÿåº¦å¿«çš„è¯æœ‰åŠ¨ç”»æ•ˆæœï¼‰
 //  arguments:{
-//    selector:selector  ±ØÌî
-//    ±ß½ç¿ØÖÆ£ºrange.{minx:,miny:,maxx:,maxy:}
-//             range:document  initialize
-//             range:false    ²»ÅĞ¶Ï±ß½ç
-//             range:true     Ïà¶ÔÓÚËü¶¨Î»µÄÄÇ¸ö¸¸ÔªËØÅĞ¶Ï±ß½ç
-//    ·½Ïò¿ØÖÆ£ºdir.{x:true/false,y:true/false}  initialize:all true
-//    ¶¯»­¿ØÖÆ£ºanimate:true/false   initialize:true
+//    selector:selector  å¿…å¡« cssé€‰æ‹©å™¨
+//    è¾¹ç•Œæ§åˆ¶ï¼šrange.{minx:,miny:,maxx:,maxy:}
+//             range:document  é»˜è®¤
+//             range:false    ä¸åˆ¤æ–­è¾¹ç•Œ
+//             range:true     ç›¸å¯¹äºå®ƒå®šä½çš„é‚£ä¸ªçˆ¶å…ƒç´ åˆ¤æ–­è¾¹ç•Œ
+//    æ–¹å‘æ§åˆ¶ï¼šdir.{x:true/false,y:true/false}  é»˜è®¤:true true
+//    åŠ¨ç”»æ§åˆ¶ï¼šanimate:true/false   é»˜è®¤true
 //  }
 
 
 class Drag{
 
     constructor (obj){
-        // »ñÈ¡ÔªËØ
+        // è·å–å…ƒç´ 
         this.elems=document.querySelectorAll(obj.selector);
         this.eleparent=this.elems[0].offsetParent;
 
-        //²ÎÊı³õÊ¼»¯
+        //å‚æ•°åˆå§‹åŒ–
         this.animate=obj.animate===false?obj.animate:true;
 
-        //±ß½ç³õÊ¼»¯
+        //è¾¹ç•Œåˆå§‹åŒ–
         this.rangeInitialize(obj);
 
-        // ÅĞ¶Ï·½Ïò
+        // åˆ¤æ–­æ–¹å‘
         if(obj.dir===undefined){
             obj.dir={x:true,y:true}
         }else{
@@ -35,12 +35,12 @@ class Drag{
         }
 
         //console.log(this.elems.length);
-        //¿ªÆôÍÏ×§
+        //å¼€å¯æ‹–æ‹½
         this.startDarg();
 
     }
 
-    //±ß½ç³õÊ¼»¯
+    //è¾¹ç•Œåˆå§‹åŒ–
     rangeInitialize(obj){
         if(obj.range==false){
             return;
@@ -62,27 +62,27 @@ class Drag{
         }
     }
 
-    // ¿ªÊ¼ÍÏ×§
+    // å¼€å§‹æ‹–æ‹½
     startDarg(){
         var that=this;
         for(var i=0;i<this.elems.length;i++){
             this.elems[i].onmousedown=function(e){
-                //×èÖ¹ä¯ÀÀÆ÷µÄÄ¬ÈÏÊÂ¼ş
+                //é˜»æ­¢æµè§ˆå™¨çš„é»˜è®¤äº‹ä»¶
                 e.preventDefault();
 
                 var ex= e.clientX;
                 var ey= e.clientY;
 
-                //µ±Ç°ºĞ×Ó¾àÀë¶¨Î»µÄ¸¸ÔªËØµÄ¾àÀë
+                //å½“å‰ç›’å­è·ç¦»å®šä½çš„çˆ¶å…ƒç´ çš„è·ç¦»
                 var ox=this.offsetLeft;
                 var oy=this.offsetTop;
-                // ÊÂ¼şÔ´µ½ÎÄµµµÄ¾àÀë - ºĞ×Óµ½ÓĞ¶¨Î»µÄ¸¸ÔªËØµÄ¾àÀë¡£Õâ¸ö³¤¶ÈÊÇ¹Ì¶¨µÄ
+                // äº‹ä»¶æºåˆ°æ–‡æ¡£çš„è·ç¦» - ç›’å­åˆ°æœ‰å®šä½çš„çˆ¶å…ƒç´ çš„è·ç¦»ã€‚è¿™ä¸ªé•¿åº¦æ˜¯å›ºå®šçš„
                 this.lenx=ex-ox;
                 this.leny=ey-oy;
                 that.move(this);
                 that.up(this);
 
-                //¿ªÊ¼µÄÊ±ºòÊó±êµÄÎ»ÖÃ
+                //å¼€å§‹çš„æ—¶å€™é¼ æ ‡çš„ä½ç½®
                 this.prex=ex;
                 this.prey=ey;
 
@@ -96,27 +96,27 @@ class Drag{
     move(obj){
         var that=this;
         window.onmousemove=function(e){
-            //×èÖ¹ä¯ÀÀÆ÷µÄÄ¬ÈÏÊÂ¼ş
+            //é˜»æ­¢æµè§ˆå™¨çš„é»˜è®¤äº‹ä»¶
             e.preventDefault();
 
-            //ÊÂ¼şÔ´µ½ÎÄµµµÄ¾àÀë - ³¤¶È = ºĞ×ÓÓ¦¸Ã¾àÀë¶¨Î»µÄ¸¸ÔªËØµÄ¾àÀë
+            //äº‹ä»¶æºåˆ°æ–‡æ¡£çš„è·ç¦» - é•¿åº¦ = ç›’å­åº”è¯¥è·ç¦»å®šä½çš„çˆ¶å…ƒç´ çš„è·ç¦»
             obj.left= e.clientX-obj.lenx;
             obj.top= e.clientY-obj.leny;
 
-            //ÒÆ¶¯ºóÊó±êµÄÎ»ÖÃ
+            //ç§»åŠ¨åé¼ æ ‡çš„ä½ç½®
             obj.nextx= e.clientX;
             obj.nexty= e.clientY;
             obj.stepx=obj.nextx-obj.prex;
             obj.stepy=obj.nexty-obj.prey;
 
-            //ÅĞ¶Ï±ß½ç
+            //åˆ¤æ–­è¾¹ç•Œ
             that.rangeDarg(obj);
             that.dirDarg(obj);
 
         }
     }
 
-    // Êó±êÌ§Æğ×¢ÏúÊÂ¼ş
+    // é¼ æ ‡æŠ¬èµ·æ³¨é”€äº‹ä»¶
     up(obj){
         var that=this;
         window.onmouseup=function(){
@@ -129,7 +129,7 @@ class Drag{
         }
     }
 
-    //ÅĞ¶Ï±ß½ç
+    //åˆ¤æ–­è¾¹ç•Œ
     rangeDarg(obj){
         if(this.minx!==null&&obj.left<this.minx){
             obj.left=this.minx;
@@ -145,7 +145,7 @@ class Drag{
         }
     }
 
-    //ÅĞ¶Ï·½Ïò
+    //åˆ¤æ–­æ–¹å‘
     dirDarg(obj){
         if(this.dir){
             if(this.dirx){
@@ -160,7 +160,7 @@ class Drag{
         }
     }
 
-    //¶¯»­Ğ§¹û
+    //åŠ¨ç”»æ•ˆæœ
     animatefun(obj){
         var xishu=0.5;
         var that=this;
