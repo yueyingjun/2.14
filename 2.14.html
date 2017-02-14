@@ -1,0 +1,141 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
+	<title>dray</title>
+</head>
+<style>
+	*{
+		padding: 0;
+		margin: 0;
+	}
+	.bb{
+		width: 300px;
+		height: 300px;
+		margin: 200px;
+		border: 1px solid #999;
+		position: relative;
+	}
+	.aa{
+		width: 100px;
+		height: 100px;
+		background: red;
+		position: absolute;
+	}
+</style>
+<body>
+	<div class="bb">
+		<div class="aa"></div>
+	</div>
+
+</body>
+<script>
+	function aa(obj){
+		this.obj=obj.ob;
+		this.minx=obj.rect.minx;
+		this.miny=obj.rect.miny;
+		this.maxx=obj.rect.maxx;
+		this.maxy=obj.rect.maxy;
+		box.style.width=this.maxx+"px";
+		box.style.height=this.maxy+"px";
+		this.step=obj.step
+		this.dirx=obj.dir.heng||"dui";
+		this.diry=obj.dir.shu||"dui";
+		this.start()
+	}
+	var divs=document.getElementsByTagName('div')[1];
+	var box=document.getElementsByTagName('div')[0];
+	aa.prototype={
+		start:function(){
+			var that=this;
+			this.obj.onmousedown=function(e){
+				var ev=e||window.event;
+				that.prex=ev.clientX;
+				that.prey=ev.clientY;
+				var cx=ev.clientX-that.obj.offsetLeft;
+				var cy=ev.clientY-that.obj.offsetTop;
+				that.ox=ev.offsetX;
+				that.oy=ev.offsetY;
+				that.x=cx-that.ox;
+				that.y=cy-that.oy;
+				that.move()
+			};
+		},
+		move:function(e){
+			var that=this;
+			document.onmousemove=function(e){
+				var ev=e||window.event;
+				that.cx=ev.clientX;
+				that.cy=ev.clientY;
+				if (that.dirx=="dui") {
+					that.obj.style.left=that.cx-that.ox-that.x+"px";
+				}
+				if (that.diry=="dui") {
+					that.obj.style.top=that.cy-that.oy-that.y+"px";
+				}
+				if (parseInt(that.obj.style.left)<that.minx) {
+					that.obj.style.left=that.minx+"px";
+				};
+				if(parseInt(that.obj.style.left)+100>that.maxx){
+					that.obj.style.left=that.maxx-100+"px";
+				};
+				if(parseInt(that.obj.style.top)<that.miny){
+					that.obj.style.top=that.miny+"px";
+				};
+				if(parseInt(that.obj.style.top)+100>that.maxy){
+					that.obj.style.top=that.maxy-100+"px";
+				}
+				that.nextx=ev.clientX;
+				that.nexty=ev.clientY;
+			}
+			that.stop()
+		},
+		stop:function(e){
+			var eve=e||window.event;
+			var that=this;
+			document.onmouseup=function(){
+				document.onmousemove=null;
+				document.onmouseup=null;
+				that.animate()
+			}
+		},
+		animate:function(){
+			var that=this;
+			var step=this.step||0.2;
+			var movex=that.nextx-that.prex;
+			var movey=that.nexty-that.prey;
+			var t = setInterval(function(){
+				if (parseInt(that.obj.style.left)<that.minx) {
+					that.obj.style.left=that.minx+"px";
+					clearInterval(t)
+				};
+				if(parseInt(that.obj.style.left)+100>that.maxx){
+					that.obj.style.left=that.maxx-100+"px";
+					clearInterval(t)
+				};
+				if(parseInt(that.obj.style.top)<that.miny){
+					that.obj.style.top=that.miny+"px";
+					clearInterval(t)
+				};
+				if(parseInt(that.obj.style.top)+100>that.maxy){
+					that.obj.style.top=that.maxy-100+"px";
+					clearInterval(t)
+				}				
+				if (that.dirx=="dui"&&parseInt(that.obj.style.left)>that.minx&&parseInt(that.obj.style.left)+100<that.maxx) {				
+					that.obj.style.left=parseInt(that.obj.style.left)+(movex*=step)+"px";
+				}
+				if (that.diry=="dui"&&parseInt(that.obj.style.top)>that.miny&&parseInt(that.obj.style.top)+100<that.maxy) {
+					that.obj.style.top=parseInt(that.obj.style.top)+(movey*=step)+"px"
+				}
+			},50);
+		}
+	}
+	new aa({ob:divs,
+		rect:{minx:0,miny:0,maxx:1000,maxy:500},
+		dir:{shu:"dui",
+			heng:"dui"
+		},
+		step:0.4
+	})
+</script>
+</html>
