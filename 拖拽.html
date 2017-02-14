@@ -1,0 +1,147 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html;charset=UTF-8" />
+	<title>Document</title>
+</head>
+<style>
+	.person{
+	width: 400px;
+	height: 400px;
+	position: relative;
+	border: 1px solid red;
+	}
+	.son{
+		width: 50px;
+		height: 50px;
+		position: absolute;
+		background: red;
+		left: 0px;
+		top: 0px;
+	}
+</style>
+<body>
+	<div class="person">
+		<div class="son"></div>
+	</div>
+</body>
+<script>
+document.addEventListener("DOMContentLoaded",function(){
+	class Drag{
+		constructor(obj){     //传入一个选择器
+			this.obj=document.querySelectorAll(obj.div); //获取类数组
+//			console.log(this.obj)
+            this.rect=obj.rect==undefined?false:true;  
+            this.minx=this.rect.minx==undefined?null:this.rect.minx;
+            this.maxx=this.rect.maxx==undefined?document.documentElement.clientWidth:this.rect.maxx;
+            this.miny=this.rect.miny==undefined?null:this.rect.miny;
+            this.maxy=this.rect.maxy==undefined?document.documentElement.clientHeight:this.rect.maxy;
+            this.dirx=obj.direction.x==false?true:obj.direction.x;
+            this.diry=obj.direction.y==false?true:obj.direction.y;
+		}
+		aldrag(){ 
+				var that=this;
+			    this.obj.onmousedown=function(e){//鼠标放上去事件
+//			    	alert(1)
+				   	var ox=this.offsetLeft; 
+				   	console.log(ox)
+			        var oy=this.offsetTop;
+					var cx=e.clientX;  
+					var cy=e.clientY;  
+					that.lenx=cx-ox;   
+					that.leny=cy-oy;  
+					that.prex=e.clientX;
+					that.prey=e.clientY;
+					that.move();    
+					that.up();
+			   }
+		}
+		move(){  //鼠标移动
+			var that=this;  
+			document.onmousemove=function(e){
+				alert(1)
+				var cx=e.clientX;
+				console.log(cx);
+				var cy=e.clientY;
+				that.nextx=e.clientX;
+				that.nexty=e.clientY;
+				that.endx=that.nextx-that.prex;
+				that.addy=that.nexty-that.prey;
+				that.left=cx-that.lenx;
+				that.top=cy-that.leny;
+				if(that.left<that.minx){
+				    that.left=that.minx;
+				}
+				if(that.top<that.miny){
+					that.top=that.miny;
+				}
+				if(that.left>that.maxx-that.obj.offsetWidth){
+					that.left=that.maxx-that.obj.offsetWidth;
+				}
+				if(that.top>that.maxy-that.obj.offsetHeight){
+					that.top=that.maxy-that.obj.offsetHeight;
+				}
+				if(that.dirx){
+					that.obj.style.left=that.left+"px";
+				}
+				if(that.diry){
+					that.obj.style.top=that.top+"px";
+				}
+			}
+		}
+		up(){ //鼠标离开
+			var that=this;
+			document.onmouseup=function(){
+				document.onmousemove=null;
+				document.onmouseup=null;
+				that.animate();
+			}
+		}
+		animate(){ //缓冲动画
+			var that=this;
+			var yinzi=0.7;
+			var t=setInterval(function(){
+				that.endx*=yinzi;
+				var nowleft=that.obj.offsetLeft+that.endx;
+				if(Math.abs(that.endx)<1){
+					clearInterval(t);
+				}else{
+					if(nowleft<that.minx){
+				        nowleft=that.minx;
+				    }
+				    if(nowleft>that.maxx-that.obj.offsetWidth){
+					   nowleft=that.maxx-that.obj.offsetWidth;
+				    }
+				    if(that.dirx){
+					that.obj.style.left=nowleft+"px";
+				    }
+				}
+			},50)
+			var t1=setInterval(function(){
+				that.endx*=yinzi;
+				var nowtop=that.obj.offsetLeft+that.endx;
+				if(Math.abs(that.endy)<1){
+					clearInterval(t1);
+				}else{
+					if(nowtop<that.miny){
+				        nowtop=that.miny;
+				    }
+				    if(nowtop>that.maxy-that.obj.offsetHeight){
+					   nowtop=that.maxy-that.obj.offsetHeight;
+				    }
+				    if(that.diry){
+					that.obj.style.top=nowtop+"px";
+				    }
+				}
+			},50)
+		}
+    }
+	
+	new Drag({   //调用
+		div:".son",
+		rect:{minx:0,miny:0,maxx:300,maxy:300},
+		direction:{x:true,y:true}
+	}).aldrag();
+})
+</script>
+</html>
