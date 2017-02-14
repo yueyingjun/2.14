@@ -1,0 +1,218 @@
+<!doctype html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Document</title>
+	<script src="function.js"></script>
+</head>
+<script>
+	
+</script>
+<style>
+	/*div{
+		width: 100px;
+		height: 100px;
+		border: 1px solid red;
+		position: absolute;
+		left: 0;top: 0;
+	}*/
+/*	div:nth-child(1){
+		top: 0;
+	}
+	div:nth-child(2){
+		top: 100px;
+	}
+	div:nth-child(3){
+		top: 200px;
+	}
+	div:nth-child(4){
+		top: 300px;
+	}
+	div:nth-child(5){
+		top: 400px;
+	}*/
+	.parent{
+		width: 200px;
+		height: 200px;
+		position: relative;
+		border: 1px solid red;
+		margin-left: 200px;
+	}
+	.son{
+		width: 100px;
+		height: 100px;
+		position: absolute;
+		left: 0;
+		top: 0;
+		background: blue;
+	}
+</style>
+<body>
+	<!-- <div></div> -->
+	<!-- <div></div> -->
+	<!-- <div></div> -->
+	<!-- <div></div> -->
+	<!-- <div></div> -->
+	<!-- <div class="parent"> -->
+		<div class="son"></div>
+	<!-- </div> -->
+</body>
+<script>
+
+// 第一种
+	// class drag{
+	// 	constructor(selector){
+	// 		this.obj=document.querySelectorAll(selector);
+	// 		this.down();
+	// 	}
+	// 	down(){
+	// 		var that=this;
+	// 		for(var i=0;i<this.obj.length;i++){
+	// 			this.obj[i].onmousedown=function(e){
+	// 			  var left=this.offsetLeft;
+	// 			  console.log(left);
+ //                  var top=this.offsetTop;
+ //                  var cx=e.clientX;
+ //                  var cy=e.clientY;
+ //                  that.lenx=cx-left;
+ //                  that.leny=cy-top;
+ //                  that.move(this);
+ //                  that.up();
+	// 			}
+	// 		}
+	// 	}
+		
+	// 	move(obj){
+	// 		var that=this;
+	// 		document.onmousemove=function(e){
+ //                var cx=e.clientX;
+ //                var cy=e.clientY;
+ //                var endx=cx-that.lenx;
+ //                var endy=cy-that.leny;
+ //                obj.style.left=endx+"px";
+ //                obj.style.top=endy+"px";
+ //            }
+	// 	}
+
+	// 	up(){
+	// 		document.onmouseup=function(){
+	// 			document.onmousemove=null;
+	// 			document.onmouseup=null;
+	// 		}
+	// 	}
+	// }
+	// window.onload=function(){
+	// 	new drag("div")
+	// }
+
+	// 第二种
+	function drag(obj){
+		this.obj=obj.ele;
+		this.minx=obj.rect.minx==undefined?null:obj.rect.minx;
+		this.maxx=obj.rect.maxx==undefined?null:obj.rect.maxx;
+		this.miny=obj.rect.miny==undefined?null:obj.rect.miny;
+		this.maxy=obj.rect.maxy==undefined?null:obj.rect.maxy;
+		this.dirx=obj.dir.x==false?obj.dir.x:true;
+		this.diry=obj.dir.y==false?obj.dir.y:true;
+		this.down();
+	}
+	drag.prototype={
+		down:function(){
+			var that=this;
+			this.obj.onmousedown=function(e){
+				var cx=e.clientX;
+				var cy=e.clientY;
+				var x=that.obj.offsetLeft;
+				var y=that.obj.offsetTop;
+				that.endx=cx-x;
+				that.endy=cy-y;
+				that.move();
+				that.up();
+				that.prex=that.obj.offsetLeft;
+				that.prey=that.obj.offsetTop;
+			}
+		},
+		move:function(obj){
+			var that=this;
+			document.onmousemove=function(e){
+				that.cx=e.clientX;
+				that.cy=e.clientY;
+				that.left=that.cx-that.endx;
+				that.top=that.cy-that.endy;
+				if(that.left<=that.minx&&that.minx!=null){
+					that.left=that.minx+"px";
+				}
+				if(that.left>=that.maxx&&that.maxx!=null){
+					that.left=that.maxx+"px";
+				}
+				if(that.top<that.miny&&that.miny!=null){
+					that.top=that.miny+"px";
+				}
+				if(that.top>that.maxy&&that.maxy!=null){
+					that.top=that.maxy+"px";
+				}
+				if(that.dirx){
+					that.obj.style.left=that.left+"px";
+				}
+				if(that.diry){
+					that.obj.style.top=that.top+"px";
+				}
+
+				that.nextx=that.left;
+				that.nexty=that.top;
+				that.lenx=that.nextx-that.prex;
+				that.leny=that.nexty-that.prey;
+				that.prex=that.nextx;
+				that.prey=that.nexty;
+			}
+			
+		},
+		up:function(){
+			var that=this;
+			document.onmouseup=function(e){
+				document.onmousemove=null;
+				document.onmouseup=null;
+				that.animate();
+			}
+		},
+		animate:function(){
+			var num=0.8;
+			var that=this;
+			var t=setInterval(function(){
+				that.lenx*=num;
+				that.left=that.obj.offsetLeft+that.lenx;
+				if(that.left<=that.minx&&that.minx!=null){
+					that.left=that.minx+"px";
+				}
+				if(that.left>=that.maxx&&that.maxx!=null){
+					that.left=that.maxx+"px";
+				}
+				that.obj.style.left=that.left+"px";
+				// 结束动画
+				if(Math.abs(that.lenx)<0.5){clearInterval(t)};
+			},50)
+			var t1=setInterval(function(){
+				that.leny*=num;
+				that.top=that.obj.offsetTop+that.leny;
+				that.obj.style.top=that.top+"px";
+				if(that.top<that.miny&&that.miny!=null){
+					that.top=that.miny+"px";
+				}
+				if(that.top>that.maxy&&that.maxy!=null){
+					that.top=that.maxy+"px";
+				}
+				// 结束动画
+				if(Math.abs(that.leny)<0.5){clearInterval(t1)};
+			},50)
+
+		}
+
+	}
+
+	window.onload=function(){
+		var obj=$(".son")[0];
+		new drag({ele:obj,rect:{minx:0,maxx:1100,miny:0,maxy:530},dir:{x:true,y:true}});
+		// new drag({ele:obj,rect:{},dir:{x:true,y:true}});
+	}
+</script>
+</html>
