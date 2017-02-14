@@ -1,0 +1,144 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+	<html lang="en">
+	<head>
+		<meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
+		<title>面向对象的方法</title>
+		<style>
+		 .box{
+		 	width: 500px;
+		 	height:500px;
+		 	border:1px solid red;
+		 	position: relative;
+		 }
+		 .son{
+		 	width: 50px;
+		 	height:50px;
+		    background: red;
+		    position: absolute;
+		    top:0;
+		    left:0;
+		 }
+		</style>
+	</head>
+	<body>
+		<div class="box">
+		   <div class="son"></div>
+		</div>
+	</body>
+	</html>	
+	<script>
+       function Drag(obj){
+            this.obj=obj.ele;
+            this.minx=obj.rect.minx==undefined?null:obj.rect.minx;       //边界初始值   
+			this.miny=obj.rect.miny==undefined?null:obj.rect.miny;
+		    this.maxx=obj.rect.maxx==undefined?null:obj.rect.maxx;
+ 			this.maxy=obj.rect.maxy==undefined?null:obj.rect.maxy;
+ 			this.x=obj.dir.x==false?obj.dir.x:true;                      //初始化
+ 	        this.y=obj.dir.x==false?obj.dir.x:true;
+ 			this.drag(); 
+       }
+       Drag.prototype={
+       	drag:function(){     
+         	    var that=this;
+                this.obj.onmousedown=function(e){
+                var left=that.obj.offsetLeft;
+                var top=that.obj.offsetTop;
+                var cw=e.clientX;
+                var ch=e.clientY;
+                that.prex=e.clientX;
+                that.prey=e.clientY;
+                that.obj.lenx=cw-left;
+                that.obj.leny=ch-top;
+                that.move();
+                that.up();
+             }
+         },
+         move:function(){
+         	var that=this;
+         	document.onmousemove=function(e){
+                  var ox=e.clientX;
+                  var oh=e.clientY;
+                  that.nextx=e.clientX;
+                  that.nexty=e.clientY;
+                  that.chax=that.nextx-that.prex;
+                  that.chay=that.nexty-that.prey;
+                  that.endx=ox-that.obj.lenx;
+                  that.endy=oh-that.obj.leny;
+                  if(that.endx<that.minx){
+                  	  that.endx=that.minx;
+                  }
+                  if(that.endy<that.miny){
+                  	 that.endy=that.miny;
+                  }
+                  if(that.endx>that.maxx-that.obj.offsetWidth){
+                     that.endx=that.maxx-that.obj.offsetWidth;
+                  }
+                  if(that.endy>that.maxy-that.obj.offsetHeight){
+                  	 that.endy=that.maxy-that.obj.offsetHeight;
+                  }
+                  // if(that.x){
+                  // 	that.obj.style.left=that.endx+"px";
+                  // }
+                  // if(that.y){
+                  // 	that.obj.style.top=that.endy+"px";
+                  // }
+                  that.obj.style.left=that.endx+"px" ;
+                  that.obj.style.top=that.endy+"px" ;
+                  that.nextx=that.prex;
+                  that.nexty=that.prey;
+            }
+         },
+         up:function(){
+         	var that=this;
+              document.onmouseup=function(){
+              	document.onmousemove=null;
+              	document.onmouseup=null;
+              	that.animate(that.obj);
+              }
+         },
+         animate:function(){
+         	 var that=this;
+         	 var beishu=0.9;
+             var t=setInterval(()=>{
+                 that.chax*=beishu;
+                 that.chay*=beishu;
+                 if(Math.abs(that.chax)<1){
+                     clearInterval(t);
+                 }else if(Math.abs(that.chay)<1){
+                 	clearInterval(t);
+                 }else{
+                 that.left=that.chax+that.obj.offsetLeft;
+                 that.top=that.chay+that.obj.offsetTop;
+                  if(that.left<that.minx){
+                  	  that.left=that.minx;
+                  }
+                  if(that.top<that.miny){
+                  	 that.top=that.miny;
+                  }
+                  if(that.left>=that.maxx-that.obj.offsetWidth){
+                     that.left=that.maxx-that.obj.offsetWidth;
+                  }
+                  if(that.top>=that.maxy-that.obj.offsetHeight){
+                  	 that.top=that.maxy-that.obj.offsetHeight;
+                  }
+                    that.obj.style.left=that.left+"px";
+                    that.obj.style.left=that.top+"px";
+                }
+             },50)
+         }
+      }
+       var son=document.getElementsByClassName("son")[0];
+       new Drag({
+       	ele:son,
+       	rect:{minx:0,
+              miny:0,
+              maxx:500,
+              maxy:500
+             },
+         dir:{
+              x:true,
+              y:true
+            }
+          })
+       // new Drag(son);
+	</script>
