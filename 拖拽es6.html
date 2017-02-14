@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title></title>
+	</head>
+	<body>
+		<b>
+			<div>1</div>
+			<div>2</div>
+			<div>3</div>
+			<div>4</div>
+			<div>5</div>
+		</b>
+		
+	</body>
+	<style>
+	    b{
+	    	display: block;
+	    	width: 1000px;
+	    	height: 500px;
+	    	border: 1px solid green;
+	    	margin: 50px auto;
+	    	position: relative;
+	    }
+		div{
+			width: 100px;
+			height: 100px;
+			border: 1px solid red;
+			position: absolute;
+			top: 0px;
+		    font-size: 30px;
+		    color: blue;
+		    line-height: 100px;
+		    text-align: center;
+		    cursor: pointer;
+		}
+		div:nth-child(1){
+			left:0px;
+		}
+		div:nth-child(2){
+			left:100px;
+		}
+		div:nth-child(3){
+			left:200px;
+		}
+		div:nth-child(4){
+			left:300px;
+		}
+		div:nth-child(5){
+			left:400px;
+		}
+	</style>
+	<script>
+		class drag{
+			constructor(obj){    //属性全写在constructor中     //这里传入一个选择器
+				//要拖拽的元素
+				this.minx=undefined?null:obj.rect.minx;
+				this.maxx=undefined?null:obj.rect.maxx;
+				this.miny=undefined?null:obj.rect.miny;
+				this.maxy=undefined?null:obj.rect.maxy;
+				this.x=undefined?false:obj.dir.x;
+				this.y=undefined?false:obj.dir.y;
+				console.log(this.x)
+				this.eles=document.querySelectorAll(obj.son);     
+				//拖拽的过程
+				this.startDrag()        //调用startDray方法
+//				console.log(this.eles)
+			}
+			
+			startDrag(){
+				var that=this
+				//循环的给每一个元素添加mousedown事件
+				for(var i=0;i<this.eles.length;i++){
+					//按下事件
+					this.eles[i].onmousedown=function(e){
+						var ev=e||window.event
+						var left=this.offsetLeft;
+						var top=this.offsetTop;
+						var cx=ev.clientX;
+			    		var cy=ev.clientY;
+			    		that.lenx=cx-left;        //将lenx leny 变成属性，以便在下个环境中可以使用
+			    		that.leny=cy-top;
+			    		
+						that.prex=cx-that.lenx;          //记录移动之前的位置
+						that.prey=cy-that.leny;
+						
+						that.move(this)	          //调用move
+						that.up(this)             //调用up
+						e.preventDefault()
+					}
+				}
+			}
+			
+			move(obj){
+				var that=this;
+	 			document.onmousemove=function(e){
+		 			var cx=e.clientX;
+					var cy=e.clientY;
+					var endx=cx-that.lenx;
+					var endy=cy-that.leny;
+					
+					that.nextx=endx;        //移动之后的位置
+					that.nexty=endy;         //移动之后的位置
+					
+					that.tempx=that.nextx-that.prex;    //移动前后位置变化量
+					that.tempy=that.nexty-that.prey;
+					
+//					判断边界
+					if(endx<that.minx){
+						endx=0;
+					}
+					if(endx>that.maxx-obj.offsetWidth){
+						endx=that.maxx-obj.offsetWidth;
+					}
+					if(endy<that.miny){
+						endy=0;
+					}
+					if(endy>that.maxy-obj.offsetHeight){
+						endy=that.maxy-obj.offsetHeight;
+					}
+//					水平,垂直方向设置
+					if(that.x){
+						obj.style.left=endx+"px";
+					}
+					if(that.y){
+						obj.style.top=endy+"px";
+					}
+					e.preventDefault()
+ 		       }
+			}
+			
+			up(obj){
+				var that=this;
+		 		document.onmouseup=function(e){
+					document.onmousemove=null;
+					document.onmouseup=null;
+					that.prex=that.nextx;
+					that.prey=that.nexty;
+					obj.animate()
+				}	
+//					console.log(that.tempx+"___"+that.tempy)
+
+                obj.animate=function(){
+                    var yinzi=0.5;
+                    var t=setInterval(()=>{
+	                    that.tempx*=yinzi;
+	                    var left=this.offsetLeft+that.tempx;
+//                 	 	console.log(that.tempx)	
+	                    if(left<that.minx){
+							left=that.minx;
+						}
+						if(left>that.maxx-this.offsetWidth){
+							left=that.maxx-this.offsetWidth;
+						}                   
+	                    if(Math.abs(that.tempx)<1){
+							clearInterval(t);
+						}else{
+							if(that.x){
+								console.log(left)
+								this.style.left=left+"px";
+							}
+						}
+                    },50)
+                    var t1=setInterval(()=>{
+	                    that.tempy*=yinzi;
+	                    var top=this.offsetTop+that.tempy;
+	                    if(top<that.miny){
+							top=that.miny;
+						}
+						if(top>that.maxy-this.offsetHeight){
+							top=that.maxy-this.offsetHeight;
+						}                   
+	                    if(Math.abs(that.tempy)<1){
+							clearInterval(t1);
+						}else{
+							if(that.y){
+								this.style.top=top+"px";
+							}
+						}
+                    },50)
+                }
+		 	}
+		}
+		new drag({son:"div"
+		,rect:{minx:0,miny:0,maxx:1000,maxy:500}
+		,dir:{x:true,y:true}
+		})
+		
+		
+	</script>
+	
+</html>
