@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title></title>
+	</head>
+	<style>
+	*{
+		padding: 0;
+		margin: 0;
+		list-style: none;
+	}
+	.parent{
+		width: 300px;
+		height: 300px;
+		background: yellowgreen;
+		position: relative;
+		border: 1px solid #FF0000;
+		top: 100px;
+		left: 100px;
+	}
+	.son{
+		width: 50px;
+		height: 50px;
+		background: blueviolet;
+		position: absolute;
+		border: 1px solid #FF0000;
+	}
+	</style>
+	<body>
+	<div class="parent">
+		<div class="son"></div>
+	</div>
+	</body>
+	<script>
+class drag{
+	constructor(selector){
+		this.eles=document.querySelectorAll(selector.eles)[0]; //获取操作元素
+		this.dirx=selector.dir.x===false?selector.dir.x:true;
+		this.diry=selector.dir.y===false?selector.dir.y:true;
+		this.minx=selector.rect.minx===undefined?null:selector.rect.minx
+		this.miny=selector.rect.miny===undefined?null:selector.rect.miny;
+		this.maxx=selector.rect.maxx===undefined?null:selector.rect.maxx;
+		this.maxy=selector.rect.maxy===undefined?null:selector.rect.maxy;
+		this.x=selector.dir.x;
+		this.y=selector.dir.y;
+		this.startDrag();
+	}
+	startDrag(){
+
+		var that=this;
+			that.eles.onmousedown=function(e){
+				var left=this.offsetLeft;  
+				var top=this.offsetTop;
+				var cx=e.clientX;
+				var cy=e.clientY;
+				that.prevx=e.clientX;
+				that.prevy=e.clientY;
+				that.lenx=cx-left;
+				that.leny=cy-top;
+				that.move();
+				that.up();
+		}
+	}
+	move(){
+		var that=this;
+		document.onmousemove=function(e){
+			var cx=e.clientX;
+			var cy=e.clientY;
+			var endx=cx-that.lenx;
+			var endy=cy-that.leny;
+			that.nextx=e.clientX;
+			that.nexty=e.clientY;
+			if(endx<that.minx&&that.minx){
+				endx=that.minx;
+			}
+			if(endy<that.miny&&that.miny){
+				endy=that.miny;
+			}
+			if(endx>that.maxx-that.eles.offsetWidth&&that.maxx){
+				endx=that.maxx-that.eles.offsetWidth;
+			}
+			if(endy>that.maxy-that.eles.offsetHeight&&that.maxy){
+				endy=that.maxy-that.eles.offsetHeight;
+			}
+			if(that.dirx){
+				that.eles.style.left=endx+"px";
+				console.log(that.eles)
+			}
+			if(that.diry){
+				that.eles.style.top=endy+"px";
+			}	
+			that.edx=that.nextx-that.prevx;
+			that.edy=that.nexty-that.prevy;
+			that.prevx=that.nextx;
+			that.prevy=that.nexty;
+		}
+	}
+	up(){
+		var that=this;
+			document.onmouseup=function(){
+				document.onmousemove=null;
+				document.onmouseup=null;
+				that.animate();
+			}
+	}
+	animate(){
+		 	var yinzi=0.9;
+		 	var t=setInterval(()=>{
+		 		this.edx*=yinzi;
+		 		var left=this.eles.offsetLeft+this.edx;
+		 		if(left<this.minx&&this.minx+1){
+		 			left=this.minx;
+		 		}
+		 		if(left<this.miny&&this.miny+1){
+		 			left=this.miny;
+		 		}
+		 		if(Math.abs(this.edx)<1){
+		 			clearInterval(t)
+		 		}else{
+		 			if(this.dirx){
+		 				this.eles.style.left=left+"px";
+		 			}
+		 		}
+		 	},50)
+		  var t1=setInterval(()=>{
+		 		this.edy*=yinzi;
+		 		var top=this.eles.offsetTop+this.edy;
+		 		if(top<this.miny&&this.miny+1){
+		 			top=this.miny;
+		 		}
+		 		if(top<this.miny&&this.miny+1){
+		 			top=this.miny;
+		 		}
+		 		if(Math.abs(this.edy)<1){
+		 			clearInterval(t1)
+		 		}else{
+		 			if(this.diry){
+		 				this.eles.style.top=top+"px";
+		 			}
+		 		}
+		 	},50)
+		 }
+}
+window.onload=function(){
+	new drag({eles:".son",rect:{minx:1,miny:1,maxx:300,maxy:300},dir:{x:true,y:true}}).startDrag()
+}
+	
+	</script>
+</html>
