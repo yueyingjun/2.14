@@ -44,23 +44,28 @@ class drag{
 		this.maxx=obj.bian===undefined?null:obj.bian.maxx	
 		this.wayx=obj.fangxiang===undefined?true:obj.fangxiang.wayx
 		this.wayy=obj.fangxiang===undefined?true:obj.fangxiang.wayy
+		this.flag=1
 		this.mousedown()
 	}
 	mousedown(){              //按下事件
 		var that=this
 		for(var i=0;i<this.obj.length;i++){
 			this.obj[i].onmousedown=function(e){
-				e.preventDefault()                     //取消浏览器默认事件
-				var ox=this.offsetLeft
-				var oy=this.offsetTop
-				var cx=e.clientX
-				var cy=e.clientY
-				that.prex=e.clientX                   //动画记录位置
-				that.prey=e.clientY
-				that.lenssx=cx-ox                     //计算按下前鼠标位置
-				that.lenssy=cy-oy
-				that.move(this)
-				that.mouseup(this)
+				if(that.flag===1){
+					that.flag=0
+					e.preventDefault()                     //取消浏览器默认事件
+					var ox=this.offsetLeft
+					var oy=this.offsetTop
+					var cx=e.clientX
+					var cy=e.clientY
+					that.prex=e.clientX                   //动画记录位置
+					that.prey=e.clientY
+					that.lenssx=cx-ox                     //计算按下前鼠标位置
+					that.lenssy=cy-oy
+					that.move(this)
+					that.mouseup(this)					
+				}
+
 			}
 		}
 	}
@@ -109,7 +114,7 @@ class drag{
 			this.leny*=xishu
 			this.endx=this.endx+this.lenx
 			this.endy=this.endy+this.leny	
-			if(Math.abs(this.lenx*xishu)<1&&Math.abs(this.leny*xishu)<1){clearInterval(t1)}
+			if(Math.abs(this.lenx*xishu)<1&&Math.abs(this.leny*xishu)<1){clearInterval(t1);this.flag=1}
 			this.panduanbian(obj)
 			this.fangxiang(obj)
 			
