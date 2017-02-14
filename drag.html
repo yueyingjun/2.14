@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title></title>
+    <style>
+        *{
+            margin:0;
+            padding:0;
+            list-style:none;
+        }
+        .fbox{
+            height:400px;
+            width:600px;
+            border:1px solid #000;
+            position:relative;
+            margin:100px;
+        }
+        .box{
+            height:100px;
+            width:100px;
+            padding-left:10px;
+            border-top:2px solid #000000;
+            background:#3bc6b1;
+            position:absolute;
+            left:20px;
+            top:0;
+        }
+
+    </style>
+</head>
+<body>
+    <div class="fbox">
+        <div class="box">
+
+        </div>
+        <div class="box">
+
+        </div>
+        <div class="box">
+
+        </div>
+        <div class="box">
+
+        </div>
+    </div>
+</body>
+
+<script src="drag.js">
+</script>
+
+
+<!--
+<script>
+    //拖拽：面向对象的方式；边界控制，方向控制，动画控制（拖动速度快的话有动画效果）
+
+    var fbox=document.getElementsByClassName("fbox")[0];
+    var box=document.getElementsByClassName("box")[0];
+
+    box.onmousedown=function(e){
+        var e=e||window.event;
+        if(e.returnValue){
+            e.returnvalue=false;
+        }else{
+            e.preventDefault();
+        }
+        var ex= e.clientX;
+        var ey= e.clientY;
+
+        var ox=box.offsetLeft;
+        var oy=box.offsetTop;
+
+        var lenx=ex-ox;
+        var leny=ey-oy;
+//        var fox=fbox.offsetLeft;
+//        var foy=fbox.offsetTop;
+
+
+        window.onmousemove=function(e){
+            var e=e||window.event;
+            if(e.returnValue){
+                e.returnvalue=false;
+            }else{
+                e.preventDefault();
+            }
+
+            var sex= e.clientX;
+            var sey= e.clientY;
+            var endx= sex-lenx;
+            var endy= sey-leny;
+
+            box.style.left=endx+"px";
+            box.style.top=endy+"px";
+
+        }
+        window.onmouseup=function(){
+            window.onmousemove=null;
+            window.onmouseup=null;
+        }
+
+    }
+
+
+    /*
+    *
+    * son到定位属性father的距离
+    * e到浏览器的距离
+    * 用第二个减去第一个，获取到除了son到father的距离以外的距离，这个值在每一次拖拽开始的时候获取，期间是固定的
+    *
+    *
+    *
+    *
+    *
+    *
+    *
+    * 通过选择器来
+    *
+    *
+    *
+    *
+    * */
+
+
+</script>
+-->
+
+
+
+</html>
