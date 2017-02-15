@@ -1,32 +1,32 @@
 /**
  * Created by lenovo on 2017/2/14.
  */
-//æ‹–æ‹½ï¼šé¢å‘å¯¹è±¡çš„æ–¹å¼ï¼›è¾¹ç•Œæ§åˆ¶ï¼Œæ–¹å‘æ§åˆ¶ï¼ŒåŠ¨ç”»æ§åˆ¶ï¼ˆæ‹–åŠ¨é€Ÿåº¦å¿«çš„è¯æœ‰åŠ¨ç”»æ•ˆæœï¼‰
+//ÍÏ×§£ºÃæÏò¶ÔÏóµÄ·½Ê½£»±ß½ç¿ØÖÆ£¬·½Ïò¿ØÖÆ£¬¶¯»­¿ØÖÆ£¨ÍÏ¶¯ËÙ¶È¿ìµÄ»°ÓĞ¶¯»­Ğ§¹û£©
 //  arguments:{
-//    selector:selector  å¿…å¡« cssé€‰æ‹©å™¨
-//    è¾¹ç•Œæ§åˆ¶ï¼šrange.{minx:,miny:,maxx:,maxy:}
-//             range:document  é»˜è®¤
-//             range:false    ä¸åˆ¤æ–­è¾¹ç•Œ
-//             range:true     ç›¸å¯¹äºå®ƒå®šä½çš„é‚£ä¸ªçˆ¶å…ƒç´ åˆ¤æ–­è¾¹ç•Œ
-//    æ–¹å‘æ§åˆ¶ï¼šdir.{x:true/false,y:true/false}  é»˜è®¤:true true
-//    åŠ¨ç”»æ§åˆ¶ï¼šanimate:true/false   é»˜è®¤true
+//    selector:selector  ±ØÌî
+//    ±ß½ç¿ØÖÆ£ºrange.{minx:,miny:,maxx:,maxy:}
+//             range:document  Ä¬ÈÏ
+//             range:false    ²»ÅĞ¶Ï±ß½ç
+//             range:true     Ïà¶ÔÓÚËü¶¨Î»µÄÄÇ¸ö¸¸ÔªËØÅĞ¶Ï±ß½ç
+//    ·½Ïò¿ØÖÆ£ºdir.{x:true/false,y:true/false}  Ä¬ÈÏ:true true
+//    ¶¯»­¿ØÖÆ£ºanimate:true/false   Ä¬ÈÏ:true
 //  }
 
 
 class Drag{
 
     constructor (obj){
-        // è·å–å…ƒç´ 
+        // »ñÈ¡ÔªËØ
         this.elems=document.querySelectorAll(obj.selector);
         this.eleparent=this.elems[0].offsetParent;
 
-        //å‚æ•°åˆå§‹åŒ–
+        //²ÎÊı³õÊ¼»¯
         this.animate=obj.animate===false?obj.animate:true;
 
-        //è¾¹ç•Œåˆå§‹åŒ–
+        //±ß½ç³õÊ¼»¯
         this.rangeInitialize(obj);
 
-        // åˆ¤æ–­æ–¹å‘
+        // ÅĞ¶Ï·½Ïò
         if(obj.dir===undefined){
             obj.dir={x:true,y:true}
         }else{
@@ -35,12 +35,12 @@ class Drag{
         }
 
         //console.log(this.elems.length);
-        //å¼€å¯æ‹–æ‹½
+        //¿ªÆôÍÏ×§
         this.startDarg();
 
     }
 
-    //è¾¹ç•Œåˆå§‹åŒ–
+    //±ß½ç³õÊ¼»¯
     rangeInitialize(obj){
         if(obj.range==false){
             return;
@@ -49,11 +49,11 @@ class Drag{
             this.miny=0;
             this.maxx=this.eleparent.clientWidth;
             this.maxy=this.eleparent.clientHeight;
-        }else if(obj.range==document||obj.range===undefined){
-            this.minx=-this.eleparent.offsetLeft;
-            this.miny=-this.eleparent.offsetTop;
-            this.maxx=document.documentElement.clientWidth-this.eleparent.offsetLeft-this.eleparent.clientLeft;
-            this.maxy=document.documentElement.clientHeight-this.eleparent.offsetTop-this.eleparent.clientTop;
+        }else if(obj.range==document||obj.range===undefined) {
+            this.minx = -this.eleparent.offsetLeft;
+            this.miny = -this.eleparent.offsetTop;
+            this.maxx = document.documentElement.clientWidth - this.eleparent.offsetLeft - this.eleparent.clientLeft;
+            this.maxy = document.documentElement.clientHeight - this.eleparent.offsetTop - this.eleparent.clientTop;
         }else{
             this.minx=obj.range.minx===undefined?null:obj.range.minx;
             this.miny=obj.range.miny===undefined?null:obj.range.miny;
@@ -62,32 +62,33 @@ class Drag{
         }
     }
 
-    // å¼€å§‹æ‹–æ‹½
+    // ¿ªÊ¼ÍÏ×§
     startDarg(){
         var that=this;
         for(var i=0;i<this.elems.length;i++){
             this.elems[i].onmousedown=function(e){
-                //é˜»æ­¢æµè§ˆå™¨çš„é»˜è®¤äº‹ä»¶
+                //×èÖ¹ä¯ÀÀÆ÷µÄÄ¬ÈÏÊÂ¼ş
                 e.preventDefault();
 
                 var ex= e.clientX;
                 var ey= e.clientY;
 
-                //å½“å‰ç›’å­è·ç¦»å®šä½çš„çˆ¶å…ƒç´ çš„è·ç¦»
+                //µ±Ç°ºĞ×Ó¾àÀë¶¨Î»µÄ¸¸ÔªËØµÄ¾àÀë
                 var ox=this.offsetLeft;
                 var oy=this.offsetTop;
-                // äº‹ä»¶æºåˆ°æ–‡æ¡£çš„è·ç¦» - ç›’å­åˆ°æœ‰å®šä½çš„çˆ¶å…ƒç´ çš„è·ç¦»ã€‚è¿™ä¸ªé•¿åº¦æ˜¯å›ºå®šçš„
+                // ÊÂ¼şÔ´µ½ÎÄµµµÄ¾àÀë - ºĞ×Óµ½ÓĞ¶¨Î»µÄ¸¸ÔªËØµÄ¾àÀë¡£Õâ¸ö³¤¶ÈÊÇ¹Ì¶¨µÄ
                 this.lenx=ex-ox;
                 this.leny=ey-oy;
-                that.move(this);
-                that.up(this);
 
-                //å¼€å§‹çš„æ—¶å€™é¼ æ ‡çš„ä½ç½®
+                //¿ªÊ¼µÄÊ±ºòÊó±êµÄÎ»ÖÃ
                 this.prex=ex;
                 this.prey=ey;
 
-               /* that.lenx=0;
-                that.leny=0;*/
+                that.move(this);
+                that.up(this);
+
+
+
 
             }
         }
@@ -96,27 +97,29 @@ class Drag{
     move(obj){
         var that=this;
         window.onmousemove=function(e){
-            //é˜»æ­¢æµè§ˆå™¨çš„é»˜è®¤äº‹ä»¶
+            //×èÖ¹ä¯ÀÀÆ÷µÄÄ¬ÈÏÊÂ¼ş
             e.preventDefault();
 
-            //äº‹ä»¶æºåˆ°æ–‡æ¡£çš„è·ç¦» - é•¿åº¦ = ç›’å­åº”è¯¥è·ç¦»å®šä½çš„çˆ¶å…ƒç´ çš„è·ç¦»
+            //ÊÂ¼şÔ´µ½ÎÄµµµÄ¾àÀë - ³¤¶È = ºĞ×ÓÓ¦¸Ã¾àÀë¶¨Î»µÄ¸¸ÔªËØµÄ¾àÀë
             obj.left= e.clientX-obj.lenx;
             obj.top= e.clientY-obj.leny;
 
-            //ç§»åŠ¨åé¼ æ ‡çš„ä½ç½®
+            //ÒÆ¶¯ºóÊó±êµÄÎ»ÖÃ
             obj.nextx= e.clientX;
             obj.nexty= e.clientY;
             obj.stepx=obj.nextx-obj.prex;
             obj.stepy=obj.nexty-obj.prey;
+            obj.prex=obj.nextx;
+            obj.prey=obj.nexty;
 
-            //åˆ¤æ–­è¾¹ç•Œ
+            //ÅĞ¶Ï±ß½ç
             that.rangeDarg(obj);
             that.dirDarg(obj);
 
         }
     }
 
-    // é¼ æ ‡æŠ¬èµ·æ³¨é”€äº‹ä»¶
+    // Êó±êÌ§Æğ×¢ÏúÊÂ¼ş
     up(obj){
         var that=this;
         window.onmouseup=function(){
@@ -129,7 +132,7 @@ class Drag{
         }
     }
 
-    //åˆ¤æ–­è¾¹ç•Œ
+    //ÅĞ¶Ï±ß½ç
     rangeDarg(obj){
         if(this.minx!==null&&obj.left<this.minx){
             obj.left=this.minx;
@@ -145,7 +148,7 @@ class Drag{
         }
     }
 
-    //åˆ¤æ–­æ–¹å‘
+    //ÅĞ¶Ï·½Ïò
     dirDarg(obj){
         if(this.dir){
             if(this.dirx){
@@ -160,15 +163,15 @@ class Drag{
         }
     }
 
-    //åŠ¨ç”»æ•ˆæœ
+    //¶¯»­Ğ§¹û
     animatefun(obj){
-        var xishu=0.5;
+        var xishu=0.7;
         var that=this;
         var t=setInterval(function(){
             obj.stepx=obj.stepx*xishu;
             obj.stepy=obj.stepy*xishu;
 
-            if(obj.lenx>=1||obj.leny>=1){
+            if(Math.abs(obj.stepx)>=1||Math.abs(obj.stepy)>=1){
                 obj.left+=obj.stepx;
                 obj.top+=obj.stepy;
                 that.rangeDarg(obj);
@@ -176,16 +179,11 @@ class Drag{
             }else{
                 clearInterval(t);
             }
-
         },50);
     }
 }
 
 
 
-new Drag(
-    {   selector:".box"
-    }
-);
 
 
