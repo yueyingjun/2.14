@@ -1,0 +1,357 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
+	<title>拖拽</title>
+	<script src="function.js"></script>
+</head>
+<style>
+	.father{
+		position: relative;
+    height: 500px;
+    width: 500px;
+    border: 1px solid #000;
+    margin: 0 auto;
+	}
+  .son{
+    height: 50px;
+    width: 50px;
+    position: absolute;
+    left: 0;
+    cursor:pointer;
+    background: pink;
+  }
+  div:nth-child(1){
+      top: 0;
+  }
+  div:nth-child(2){
+      top: 100px;
+  }
+  div:nth-child(3){
+      top: 200px;
+  }
+  div:nth-child(4){
+      top: 300px;
+  }
+  div:nth-child(5){
+      top: 400px;
+  }
+</style>
+<body>
+	<div class="father">
+   
+      <div class="son"></div>
+      <!-- <div></div>
+      <div></div>
+      <div></div>
+      <div></div> -->
+  
+  </div>
+</body>
+<script>
+// 面向对象
+// 1、拖拽的元素要定位，改变left
+// 2、分析拖拽的动作
+// 3、分解动作
+
+// 2.14作业
+// 原型
+   function drag(obj){
+    this.obj=obj.ele;
+    this.minx=obj.rect.minx===undefined?null:obj.rect.minx;
+    this.miny=obj.rect.miny===undefined?null:obj.rect.miny;
+    this.maxx=obj.rect.maxx===undefined?null:obj.rect.maxx;
+    this.maxy=obj.rect.maxy===undefined?null:obj.rect.maxy;
+    this.dirx=obj.dir.dirx===false? obj.dir.dirx:true;
+    this.diry=obj.dir.diry===false? obj.dir.diry:true;
+    this.down();
+   }
+   drag.prototype={
+    down:function(){
+      var that=this;
+      this.obj.onmousedown=function(e){
+        var ev=e||window.event;
+        var cx=ev.clientX;    //鼠标相对浏览器
+        var cy=ev.clientY;
+        var left=that.obj.offsetLeft;    //盒子相对于浏览器
+        var top=that.obj.offsetTop;
+        that.prex=ev.clientX;
+        that.prey=ev.clientY;
+
+        that.endx=cx-left;      //鼠标相对于盒子
+        that.endy=cy-top;
+        that.move();
+        that.up();
+        e.preventDefault();
+
+      }
+    },
+    move:function(){
+      var that=this;
+      document.onmousemove=function(e){
+        var ev=e||window.event;
+        var cx=ev.clientX;     //鼠标相对浏览器
+        var cy=ev.clientY;
+        
+        that.nextx=ev.clientX;
+        that.nexty=ev.clientY;
+
+
+        that.lx=that.nextx-that.prex;
+        that.ly=that.nexty-that.prey;
+        
+
+
+        that.lenx=cx-that.endx;
+        that.leny=cy-that.endy;
+        if (that.lenx<that.minx) {
+          that.lenx=that.minx;
+        }
+        if (that.leny<that.miny) {
+          that.leny=that.miny;
+        }
+        if (that.lenx>that.maxx-that.obj.offsetWidth&&that.maxx) {
+          that.lenx=that.maxx-that.obj.offsetWidth;
+        }
+        if (that.leny>that.maxy-that.obj.offsetHeight&&that.maxy) {
+          that.leny=that.maxy-that.obj.offsetHeight;
+        }
+        if(that.dirx){
+          that.obj.style.left=that.lenx+"px";
+        }
+        if(that.diry){
+          that.obj.style.top=that.leny+"px";
+        }
+        that.obj.style.left=that.lenx+"px";    
+        that.obj.style.top=that.leny+"px";
+        that.prex=that.nextx;
+        that.prey=that.nexty;
+        e.preventDefault();
+         }
+    },
+    up:function(){
+      var that=this;
+      document.onmouseup=function(e){
+        document.onmousemove=null;
+        document.onmousedown=null;
+        that.animate(that.obj);
+      }
+    },
+    animate:function(){
+      // alert(1)
+      var that=this;
+      var speed=0.8;
+      var t=setInterval(()=>{ 
+        that.lx*=speed;
+        that.ly*=speed;
+        if(Math.abs(that.lx)<1){
+          clearInterval(t);
+        }else if(Math.abs(that.ly)<1){
+          clearInterval(t);
+        }
+        that.left=that.lx+that.obj.offsetLeft;
+        that.top=that.ly+that.obj.offsetTop;
+        // alert(that.left)
+        if (that.left<that.minx) {
+          that.left=that.minx;
+        }
+        if (that.left>=that.maxx-that.obj.offsetWidth) {
+          that.left=that.maxx-that.obj.offsetWidth;
+        }
+        if (that.top<that.miny) {
+          that.top=that.miny;
+        }
+        if (that.top>=that.maxy-that.obj.offsetHeight) {
+          that.top=that.maxy-that.obj.offsetHeight;
+        }
+          that.obj.style.left=that.left+"px";
+          that.obj.style.top=that.top+"px";
+        },50)
+      }
+   } 
+   // window.onload=function(){
+    var son=document.getElementsByClassName("son")[0];
+    new drag({
+          ele:son,
+          rect:{
+            minx:0,
+            miny:0,
+            maxx:500,
+            maxy:500
+          },
+          dir:{
+            dirx:true,
+            diry:true
+          }
+      })
+   // }
+  
+
+
+
+
+
+
+// 两个盒子
+  // window.onload=function(e){
+  //    var father=document.getElementsByClassName('father')[0];
+  //    var son=document.getElementsByClassName('son')[0];
+     
+  //    son.onmousedown=function(e){
+  //     var ev=e||window.event;
+  //     var ox=ev.clientX;
+  //     var oy=ev.clientY;
+  //     var x=son.offsetLeft;
+  //     var y=son.offsetTop;
+  //     var endx=ox-x;
+  //     var endy=oy-y;
+
+  //     document.onmousemove=function(e){
+  //       var ev=e||window.event;
+  //       var cx=ev.clientX;
+  //       var cy=ev.clientY;
+  //       // var fc=father.clientWidth;
+  //       son.style.left=cx-endx+"px";
+  //       son.style.top=cy-endy+"px";
+  //       e.preventDefault();
+  //     }
+
+
+  //     document.onmouseup=function(e){
+  //       document.onmousemove=null;
+  //       document.onmousedown=null;
+  //     }
+  //       e.preventDefault();
+  //    }
+  // }
+  
+
+
+// es6    W3C
+//   class drag{     //目的：完成拖拽
+//     constructor(selector){
+//       // 要拖拽的元素
+//       this.eles=document.querySelectorAll(selector);
+//       // alert(this.eles.length)
+//       // 开始拖拽
+//       this.startDrag();
+//     }
+//     startDrag(){
+//       var that=this;
+//       // 循环的给每一个元素添加事件
+//       for (var i = 0; i < this.eles.length; i++) {
+//         this.eles[i].onmousedown=function(e){
+//             var e=e||window.event; 
+//             var left=this.offsetLeft;//元素左边缘到浏览器左边缘
+//             var top=this.offsetTop;
+//             var cx=e.clientX;    //鼠标相对于浏览器左边缘的位置
+//             var cy=e.clientY;
+//             that.lenx=cx-left;    //鼠标到盒子左边缘的距离
+//             // alert(that.lenx)
+//             that.leny=cy-top;
+//             that.move(this);  //点击谁
+//             that.up();
+//         }
+//       }
+//     }
+//     move(obj){
+//         var that=this;        
+//         document.onmousemove=function(e){
+//           var e=e||window.event; 
+//           var cx=e.clientX;   //鼠标相对于浏览器左边缘的位置
+//           var cy=e.clientY;
+//           that.endx=cx-that.lenx;    //盒子左边缘到浏览器左边缘的距离    
+//           that.endy=cy-that.leny;
+//           obj.style.left=that.endx+"px";   //一直在变
+//           obj.style.top=that.endy+"px";
+//         }
+        
+//     }
+//     up(){
+//       document.onmouseup=function(e){
+//         document.onmousemove=null;      
+//         document.onmousedown=null;
+//       }
+        
+//     }
+//   }
+ 
+// window.onload=function(){
+//   new drag("div");
+// }                                                                           
+
+// 2.13作业
+    //     class Drag{
+    //        constructor(obj){
+    //        this.obj=obj;
+    //        this.cw=document.documentElement.clientWidth; 
+    //        this.ch=document.documentElement.clientHeight;
+    //        this.ow=this.obj.offsetWidth;
+    //        this.oh=this.obj.offsetHeight;
+    //        this.left=0;
+    //        this.top=0;
+    //        this.ox=0;
+    //        this.oy=0;
+    //        this.cx=0;
+    //        this.cy=0;
+    //     }
+    //      drag(){     //函数
+    //             this.down();
+    //         }    //,不能忽略
+    //         down(){
+    //             var that=this;
+    //             this.obj.onmousedown=function(e){   //传参，调用盒子
+    //                 var ev=e||window.event;
+    //                 if (ev.returnValue) {
+    //                     ev.returnValue=false;
+    //                 }else{
+    //                     ev.preventDefault;
+    //                 }
+    //                 that.ox=ev.offsetX;
+    //                 that.oy=ev.offsetY;
+    //                 that.move();
+    //                 that.up();
+    //             }
+    //         }
+    //         move(){
+    //             var that=this;
+    //             document.onmousemove=function(e){   //调用document
+    //                 var ev=e||window.event;
+    //                 that.cx=ev.clientX;
+    //                 that.cy=ev.clientY;
+    //                 that.left=that.cx-that.ox;
+    //                 that.top=that.cy-that.oy;
+    //                 if (that.left<=0) {     
+    //                     that.left=0;
+    //                 };
+    //                 if (that.top<=0) {
+    //                     that.top=0;
+    //                 };
+    //                 if (that.left>=that.cw-that.ow) {
+    //                     that.left=that.cw-that.ow;
+    //                 };
+    //                 if (that.top>=that.ch-that.oh) {
+    //                     that.top=that.ch-that.oh;
+    //                 };
+    //                 that.obj.style.left=that.left+"px";
+    //                 that.obj.style.top=that.top+"px";
+    //             }
+    //         }
+    //         up(){
+    //             document.onmouseup=function(){
+    //                 document.onmousemove=null;
+    //                 document.onmousedown=null;
+    //             }
+    //         }
+    
+    // }
+        
+           
+    //     var obj=$("div")[0];
+    //     // var newobj=new Drag(obj);   //实例化对象
+    //     // newobj.drag();
+
+    //   new Drag(obj).drag();
+
+</script>
+</html>
