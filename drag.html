@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title></title>
+    <script src="drag.js"></script>
+    <style>
+        *{
+            margin:0;
+            padding:0;
+            list-style:none;
+        }
+        .fbox{
+            height:400px;
+            width:600px;
+            border:1px solid #000;
+            position:relative;
+            margin:100px;
+        }
+        .box{
+            height:100px;
+            width:100px;
+            padding-left:10px;
+            border-top:2px solid #000000;
+            background:#3bc6b1;
+            position:absolute;
+            left:20px;
+            top:0;
+        }
+
+    </style>
+</head>
+<body>
+    <div class="fbox">
+        <div class="box">
+
+        </div>
+        <div class="box">
+
+        </div>
+        <div class="box">
+
+        </div>
+        <div class="box">
+
+        </div>
+    </div>
+</body>
+
+<script>
+    new Drag(
+        {   selector:".box"
+        }
+    );
+</script>
+
+
+
+
+
+</html>
