@@ -1,0 +1,261 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
+	<title>Document</title>
+</head>
+<script>
+	document.addEventListener("DOMContentLoaded",function(){
+		// function drag(obj){
+		// 	this.ele=obj.ele;
+		// 	this.minx=obj.rect.minx===undefined?null:obj.rect.minx;
+		// 	this.miny=obj.rect.miny===undefined?null:obj.rect.miny;
+		// 	this.maxx=obj.rect.maxx===undefined?null:obj.rect.maxx;
+		// 	this.maxy=obj.rect.maxy===undefined?null:obj.rect.maxy;
+		// 	this.leftx=obj.dir.left===false?obj.dir.left:true;
+		// 	this.topy=obj.dir.top===false?obj.dir.top:true;
+		// 	this.start();
+		// }
+		// drag.prototype={
+		// 	start:function(){
+		// 		var that=this;
+		// 		that.ele.onmousedown=function(e){
+		// 			var left=that.ele.offsetLeft;
+		// 			var top=that.ele.offsetTop;
+		// 			var cx=e.clientX;
+		// 			var cy=e.clientY;
+		// 			that.prevx=e.clientX;
+		// 			that.prevy=e.clientY;
+		// 			that.x=cx-left;
+		// 			that.y=cy-top;
+		// 			that.move();
+		// 			that.up();
+		// 		}
+		// 	},
+		// 	move:function(){
+		// 		var that=this;
+		// 		document.onmousemove=function(e){
+		// 			var cx=e.clientX;
+		// 			var cy=e.clientY;
+		// 			that.nextx=e.clientX;
+		// 			that.nexty=e.clientY;
+		// 			var left=cx-that.x;
+		// 			var top=cy-that.y;
+		// 			if(left<that.minx&&that.minx+1){
+		// 				left=that.minx;
+		// 			}
+		// 			if(left>that.maxx-that.ele.offsetWidth&&that.maxx){
+		// 				left=that.maxx-that.ele.offsetWidth;
+		// 			}
+		// 			if(top<that.miny&&that.miny+1){
+		// 				top=that.miny;
+		// 			}
+		// 			if(top>that.maxy-that.ele.offsetHeight&&that.maxy){
+		// 				top=that.maxy-that.ele.offsetHeight;
+		// 			}
+		// 			if(that.leftx){
+		// 				that.ele.style.left=left+"px";
+		// 			}
+		// 			if(that.topy){
+		// 				that.ele.style.top=top+"px";
+		// 			}
+		// 			that.lenx=that.nextx-that.prevx;
+		// 			that.leny=that.nexty-that.prevy;
+		// 			that.prevx=that.nextx;
+		// 			that.prevy=that.nexty;
+		// 		}
+		// 	},
+		// 	up:function(){
+		// 		var that=this;
+		// 		document.onmouseup=function(){
+		// 			document.onmousemove=null;
+		// 			document.onmouseup=null;
+		// 			that.animate();
+		// 		}
+		// 	},
+		// 	animate:function(){
+		// 		var yinzi=0.8;
+		// 		var t=setInterval(()=>{
+		// 			this.lenx*=yinzi;
+		// 			var left=this.ele.offsetLeft+this.lenx;
+		// 			if(left<this.minx&&this.minx+1){
+		// 				left=this.minx;
+		// 			}
+		// 			if(left>this.maxx-this.ele.offsetWidth&&this.maxx){
+		// 				left=this.maxx-this.ele.offsetWidth;
+		// 			}
+		// 			if(Math.abs(this.lenx)<1){
+		// 				clearInterval(t);
+		// 			}else{
+		// 				if(this.leftx){
+		// 					this.ele.style.left=left+"px";
+		// 				}						
+		// 			}
+
+		// 		},50)
+		// 		var t1=setInterval(()=>{
+		// 			this.leny*=yinzi;
+		// 			var top=this.ele.offsetTop+this.leny;
+		// 			if(top<this.miny&&this.miny+1){
+		// 				top=this.miny;
+		// 			}
+		// 			if(top>this.maxy-this.ele.offsetHeight&&this.maxy){
+		// 				top=this.maxy-this.ele.offsetHeight;
+		// 			}
+		// 			if(Math.abs(this.leny)<1){
+		// 				clearInterval(t1);
+		// 			}else{
+		// 				if(this.topy){
+		// 					this.ele.style.top=top+"px";
+		// 				}	
+		// 			}
+		// 		},50)
+		// 	}
+		// }
+
+
+		// var son=document.getElementsByClassName("son")[0];
+		// new drag({
+		// 	ele:son,
+		// 	rect:{minx:0,miny:0,maxx:400,maxy:400},
+		// 	dir:{left:false,top:true}
+		// })
+
+	class drag{
+		constructor(obj){
+			this.ele=obj.ele;
+			this.minx=obj.rect.minx===undefined?null:obj.rect.minx;
+			this.miny=obj.rect.miny===undefined?null:obj.rect.miny;
+			this.maxx=obj.rect.maxx===undefined?null:obj.rect.maxx;
+			this.maxy=obj.rect.maxy===undefined?null:obj.rect.maxy;
+			this.leftx=obj.dir.left===false?obj.dir.left:true;
+			this.topy=obj.dir.top===false?obj.dir.top:true;
+			this.start();
+		}
+		start(){
+			var that=this;
+			that.ele.onmousedown=function(e){
+				var left=that.ele.offsetLeft;
+				var top=that.ele.offsetTop;
+				var cx=e.clientX;
+				var cy=e.clientY;
+				that.prevx=e.clientX;
+				that.prevy=e.clientY;
+				that.x=cx-left;
+				that.y=cy-top;
+				that.move();
+				that.up();
+			}
+		}
+		move(){
+			var that=this;
+			document.onmousemove=function(e){
+				var cx=e.clientX;
+				var cy=e.clientY;
+				that.nextx=e.clientX;
+				that.nexty=e.clientY;
+				var left=cx-that.x;
+				var top=cy-that.y;
+				if(left<that.minx&&that.minx+1){
+					left=that.minx;
+				}
+				if(left>that.maxx-that.ele.offsetWidth&&that.maxx){
+					left=that.maxx-that.ele.offsetWidth;
+				}
+				if(top<that.miny&&that.miny+1){
+					top=that.miny;
+				}
+				if(top>that.maxy-that.ele.offsetHeight&&that.maxy){
+					top=that.maxy-that.ele.offsetHeight;
+				}
+				if(that.leftx){
+					that.ele.style.left=left+"px";
+				}
+				if(that.topy){
+					that.ele.style.top=top+"px";
+				}
+				that.lenx=that.nextx-that.prevx;
+				that.leny=that.nexty-that.prevy;
+				that.prevx=that.nextx;
+				that.prevy=that.nexty;
+			}
+		}
+		up(){
+			var that=this;
+			document.onmouseup=function(){
+				document.onmousemove=null;
+				document.onmouseup=null;
+				that.animate();
+			}
+		}
+		animate(){
+			var yinzi=0.8;
+			var t=setInterval(()=>{
+				this.lenx*=yinzi;
+				var left=this.ele.offsetLeft+this.lenx;
+				if(left<this.minx&&this.minx+1){
+					left=this.minx;
+				}
+				if(left>this.maxx-this.ele.offsetWidth&&this.maxx){
+					left=this.maxx-this.ele.offsetWidth;
+				}
+				if(Math.abs(this.lenx)<1){
+					clearInterval(t);
+				}else{
+					if(this.leftx){
+						this.ele.style.left=left+"px";
+					}					
+				}
+			},50)
+			var t1=setInterval(()=>{
+				this.leny*=yinzi;
+				var top=this.ele.offsetTop+this.leny;
+				if(top<this.miny&&this.miny+1){
+					top=this.miny;
+				}
+				if(top>this.maxy-this.ele.offsetHeight&&this.maxy){
+					top=this.maxy-this.ele.offsetHeight;
+				}
+				if(Math.abs(this.leny)<1){
+					clearInterval(t1);
+				}else{
+					if(this.topy){
+						this.ele.style.top=top+"px";
+					}	
+				}
+			},50)
+		}			
+	}
+		
+	var son=document.getElementsByClassName("son")[0];
+	new drag({
+		ele:son,
+		rect:{minx:0,miny:0,maxx:400,maxy:400},
+		dir:{left:true,top:true}
+	})
+
+
+
+	})
+</script>
+<style>
+	.parent{
+		width:400px;
+		height:400px;
+		position: relative;
+		margin:100px;
+		border:1px solid red;
+	}
+	.son{
+		width:100px;
+		height:100px;
+		background:blue;
+		position: absolute;
+	}
+</style>
+<body>
+	<div class="parent">
+		<div class="son"></div>
+	</div>
+</body>
+</html>
