@@ -146,8 +146,8 @@ window.onload=function(){
         if(top<that.miny&&(that.miny||that.miny==0)){top=that.miny;};
         if(left>that.maxx-that.obj.offsetWidth&&that.maxx){left=that.maxx-that.obj.offsetWidth};
         if(top>that.maxy-that.obj.offsetHeight&&that.maxy){top=that.maxy-that.obj.offsetHeight};
-       that.obj.style.left=left+"px";
-       that.obj.style.top=top+"px";     
+       if(that.x){that.obj.style.left=left+"px";}
+       if(that.y){that.obj.style.top=top+"px";}     
          },60);
         }
     }
