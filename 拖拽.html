@@ -1,0 +1,173 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
+	<title>Document</title>
+</head>	
+<script>
+	class Drag{
+		constructor(obj){
+			this.eles=document.querySelectorAll(obj.sel);
+			this.minx=obj.sta.minx==undefined?null:obj.sta.minx;
+			this.miny=obj.sta.miny==undefined?null:obj.sta.miny;
+			this.maxx=obj.sta.maxx==undefined?null:obj.sta.maxx;
+			this.maxy=obj.sta.maxy==undefined?null:obj.sta.maxy;
+			this.dx=obj.dir.x===false?obj.dir.x:true;
+			this.dy=obj.dir.y===false?obj.dir.y:true;
+			this.start();
+		}
+		start(){
+			var that = this;
+			for(var i=0;i<this.eles.length;i++){
+				this.eles[i].onmousedown=function(e){
+					var e = e||window.event;
+					var left = this.offsetLeft;
+					var top = this.offsetTop;
+					var cx = e.clientX;
+					var cy = e.clientY;
+					that.prex = cx;
+					that.prey = cy;
+					that.lenx=cx-left;
+					that.leny=cy-top;
+					that.move(this);
+					that.up(this);
+				}
+			}
+			
+		}
+		move(obj){
+			var that = this;
+			document.onmousemove=function(e){
+				var e = e||window.event;
+				if(e.preventDefault){
+					e.preventDefault();
+				}else{
+				   e.returnValue=false;
+				}
+				var cx = e.clientX;
+				var cy = e.clientY;
+				that.nextx = cx;
+				that.nexty = cy;
+				var endx=cx-that.lenx;
+				var endy=cy-that.leny;
+				if(endx<=that.minx&&that.minx+1){
+					endx=that.minx;
+				}
+				if(endy<=that.miny&&that.miny+1){
+					endy=that.miny;
+				}
+				if(endx>=that.maxx-obj.offsetWidth&&that.maxx){
+					endx=that.maxx-obj.offsetWidth;
+				}
+				if(endy>=that.maxy-obj.offsetHeight&&that.maxy){
+					endy=that.maxy-obj.offsetHeight;
+				}
+				if(that.dx){
+					obj.style.left=endx+"px";
+				}
+				if(that.dy){
+					obj.style.top=endy+"px";
+				}
+				that.intx = that.nextx-that.prex;
+				that.inty = that.nexty-that.prey;
+				that.prex=that.nextx;
+				that.prey=that.nexty;				
+			}
+		}
+		up(obj){
+			var that = this;
+			document.onmouseup=function(){
+				document.onmousemove=null;
+				document.onmouseup=null;
+				that.animate(obj);
+			}
+		}
+		animate(obj){
+			var yinzi = 0.5;
+			var t=setInterval(()=>{
+				this.intx*=yinzi;
+				var left = obj.offsetLeft+this.intx;
+				if(left<this.minx&&this.minx+1){
+					left=this.minx;
+				}
+				if(left>this.maxx-obj.offsetWidth&&this.maxx){
+					left=this.maxx-obj.offsetWidth;
+				}
+				if(Math.abs(this.intx)<1){
+					clearInterval(t);
+				}else{
+					if(this.dx){
+						obj.style.left=left+"px";
+					}
+				}
+			},50)
+			var t1=setInterval(()=>{
+				this.inty*=yinzi;
+				var top = obj.offsetTop+this.inty;
+				if(top<this.miny&&this.miny+1){
+					top=this.miny;
+				}
+				if(top>this.maxy-obj.offsetHeight&&this.maxy){
+					top=this.maxy-obj.offsetHeight;
+				}
+				if(Math.abs(this.inty)<1){
+					clearInterval(t1);
+				}else{
+					if(this.dy){
+						obj.style.top=top+"px";
+					}
+				}
+			},50)
+		}
+
+	}
+
+
+
+	window.onload=function(){
+		var newobj = new Drag({
+			sel:"#btn",
+			sta:{minx:0,maxx:500,miny:0,maxy:500},
+			dir:{
+				x:true,
+				y:true
+			}
+		});
+	}
+	// document.addEventListener("DOMContentloaded",function(){
+	// 	var newobj = new Drag("#box");
+	// 	newobj.start();
+	// })
+		
+	
+</script>
+<style>
+	*{
+		margin:0;
+		padding:0;
+		list-style:none;
+	}
+	#box{
+		width:500px;
+		height:500px;
+		border:1px solid blue;
+		position: fixed;
+		top:100px;
+		left:100px;
+	}
+	#btn{
+		width:100px;
+		height:100px;
+		background-color: #25b25e;
+		position: absolute;
+		left: 50px;
+		top:50px;
+	}
+</style>
+
+<body>
+	<div id="box">
+		<div id="btn"></div>
+	</div>
+</body>
+</html>
