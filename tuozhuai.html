@@ -1,4 +1,3 @@
-# 2.14
 <!DOCTYPE html>
 <html>
 	<head>
@@ -56,12 +55,40 @@
 	</body>
 	<script>
 	
-
+//		var s=document.getElementsByClassName("son")[0];
+//		var ww=document.documentElement.clientWidth;
+//		var wh=document.documentElement.clientHeight;
+//		s.onmousedown=function(e){
+//			var event=e||window.event;
+//			var pl=s.offsetLeft;    //鼠标到距离事件源左上角距离
+//			var pt=s.offsetTop;
+//			var lw=event.clientX;   //鼠标到浏览器距离
+//			var lh=event.clientY;
+//			var a=lw-pl;     //事件源左上角到父元素的距离
+//			var b=lh-pt;   
+//			document.onmousemove=function(e){
+//				var event=e||window.event;
+//				var aa=event.clientX;   //鼠标距浏览器x方向距离
+//				var bb=event.clientY;												
+//				var left=aa-a;
+//				var top=bb-b;
+//				s.style.left=left+"px";
+//				s.style.top=top+"px";
+//				e.preventDefault()
+//			}
+//			document.onmouseup=function(){
+//				document.onmousemove=null;
+//				document.onmouseup=null;
+//			}
+//				e.preventDefault()
+//		}
+	
 //		面向对象方式
 window.onload=function(){
 		class Drag{			
 			constructor(obj){  
-
+//				要拖拽的元素
+//				this.elem=document.getElementsByName(obj);
 				this.obj=obj.elem;
 				this.minx=obj.rect===undefined?false:obj.rect.minx;
 				this.maxx=obj.rect===undefined?false:obj.rect.maxx;
