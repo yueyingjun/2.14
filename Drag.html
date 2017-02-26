@@ -1,0 +1,178 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
+	<title>拖拽设定边界动画效果</title>
+</head>
+<style>
+
+/*div{
+	width: 100px;
+	height: 100px;
+	margin:0 auto;
+	background: yellow;
+	position: absolute;
+	left: 40%;
+	text-align: center;
+	line-height: 100px;
+	cursor: pointer;
+}
+div:nth-child(1){
+	top:0;
+}
+div:nth-child(2){
+	top:100px;
+}
+div:nth-child(3){
+	top:200px;
+}
+div:nth-child(4){
+	top:300px;
+}
+div:nth-child(5){
+	top:400px;
+}*/
+.son{
+	width: 100px;
+	height: 100px;
+	position: absolute;
+	top: 0px;
+	left: 0px;
+	background: red;
+}
+	.father{
+		width: 700px;
+		height: 600px;
+		position: relative;
+		top: 0px;
+		left: 100px;
+		background: blue;
+	}
+</style>
+<body>
+<!-- 	<div>对</div>
+	<div>对</div>
+	<div>对</div>
+	<div>对</div>
+	<div>对</div>	 -->
+
+	<div class="father">
+	   <div class="son">	</div>
+    </div>
+</body>
+<script>
+window.onload=function(){
+    
+
+	function Drag(obj){
+		this.obj=obj.eles;
+		this.down();
+		this.minx=obj.father.minx==undefined?null:obj.father.minx;
+		this.miny=obj.father.miny==undefined?null:obj.father.miny;
+		this.maxx=obj.father.maxx==undefined?null:obj.father.maxx;
+		this.maxy=obj.father.maxy==undefined?null:obj.father.maxy; 
+		this.x=obj.fx.x===false?obj.fx.x:true;
+		this.y=obj.fx.y===false?obj.fx.y:true;
+		this.down();      
+	}
+    Drag.prototype={
+        down:function(){
+             var that=this;
+             this.obj.onmousedown=function(e){
+                 e.preventDefault();
+                 var left=that.obj.offsetLeft;
+                 var top=that.obj.offsetTop;
+                 var cx=e.clientX;
+                 var cy=e.clientY;
+                 that.lenx=cx-left;
+                 that.leny=cy-top;
+                 that.move();
+                 that.up();
+                 that.prex=e.clientX;
+                 that.prey=e.clientY;
+
+             }
+        },
+        move:function(){
+        	var that=this;
+        	document.onmousemove=function(e){
+        		 e.preventDefault();
+                 var cx=e.clientX;
+                 var cy=e.clientY;
+	             var endx=cx-that.lenx;
+	             var endy=cy-that.leny; 
+                 that.nextx=e.clientX;
+                 that.nexty=e.clientY;
+                 // 判断边界
+                 if(endx<that.minx&&(that.minx||that.minx==0)){endx=that.minx;}
+                 if(endx>that.maxx-that.obj.offsetWidth&&that.maxx){endx=that.maxx-that.obj.offsetWidth};
+                 if(endy<that.miny&&(that.miny||that.miny==0)){endy=that.miny;}
+                 if(endy>that.maxy-that.obj.offsetHeight&&that.maxy){endy=that.maxy-that.obj.offsetHeight};
+                 if(that.x){ that.obj.style.left=endx+"px";}
+                 if(that.y){ that.obj.style.top=endy+"px";}
+                 that.tx=that.nextx-that.prex;
+                 that.ty=that.nexty-that.prey;
+                 that.prex=that.nextx;
+                 that.prey=that.nexty;            
+	      	}
+
+        },
+        up:function(){
+        	var that=this;
+		   	document.onmouseup=function(){
+		   	  document.onmousemove=null;
+		   	  document.onmouseup=null;
+		   	  that.animate();
+
+		   	}
+        },
+        animate:function(){
+        	var that=this;
+        	var xishu=0.7;
+      var t=setInterval(function(){  
+        that.lenx*=xishu;
+        that.leny*=xishu;
+        if(Math.abs(that.lenx)>=Math.abs(that.leny)){
+          if(Math.abs(that.lenx)<=1){
+            clearInterval(t)
+          }
+        }else if(Math.abs(that.leny)<=1){
+            clearInterval(t)
+        }
+          // 判断边界
+       var left=that.tx+that.obj.offsetLeft;
+       var top=that.ty+that.obj.offsetTop;
+        if(left<that.minx&&(that.minx||that.minx==0)){left=that.minx;};
+        if(top<that.miny&&(that.miny||that.miny==0)){top=that.miny;};
+        if(left>that.maxx-that.obj.offsetWidth&&that.maxx){left=that.maxx-that.obj.offsetWidth};
+        if(top>that.maxy-that.obj.offsetHeight&&that.maxy){top=that.maxy-that.obj.offsetHeight};
+       if(that.x){that.obj.style.left=left+"px";}
+       if(that.y){that.obj.style.top=top+"px";}     
+         },60);
+        }
+    }
+    var box=document.getElementsByClassName("son")[0];
+    new Drag({eles:box,father:{minx:10,maxx:700,miny:10,maxy:600},fx:{x:true,y:true}});
+
+
+
+
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</script>
+</html>
